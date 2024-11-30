@@ -3,7 +3,7 @@ module github.com/morehao/gcli
 go 1.23.3
 
 require (
-	github.com/morehao/go-tools v1.2.4
+	github.com/morehao/go-tools v1.2.5
 	github.com/spf13/cobra v1.8.1
 	go.uber.org/zap v1.27.0
 	gorm.io/gorm v1.25.12
