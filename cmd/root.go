@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/morehao/go-tools/gcli/cmd/generate"
+	"github.com/morehao/gcli/cmd/generate"
 	"github.com/spf13/cobra"
 )
 
