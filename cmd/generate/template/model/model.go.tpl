@@ -3,7 +3,7 @@ package dao{{.PackagePascalName}}
 import (
 	"fmt"
 	"{{.ProjectRootDir}}/internal/pkg/errorCode"
-	"{{.ProjectRootDir}}/internal/{{.ServiceName}}/model"
+	"{{.ProjectRootDir}}/internal/app/model"
 	"time"
 
 	"github.com/gin-gonic/gin"
