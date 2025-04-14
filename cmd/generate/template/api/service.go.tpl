@@ -8,7 +8,7 @@ import (
 
 {{if not .TargetFileExist}}
 type {{.ReceiverTypePascalName}}Svc interface {
-    {{.FunctionName}}(c *gin.Context, req *dto{{.PackagePascalName}}.{{.FunctionName}}Req) (*dto{{.PackagePascalName}}.{{.FunctionName}}Resp, error)
+    {{.FunctionName}}(c *gin.Context, req *dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req) (*dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp, error)
 }
 
 type {{.ReceiverTypeName}}Svc struct {
@@ -21,6 +21,6 @@ func New{{.ReceiverTypePascalName}}Svc() {{.ReceiverTypePascalName}}Svc {
     }
 }
 {{end}}
-func (svc *{{.ReceiverTypeName}}Svc) {{.FunctionName}}(c *gin.Context, req *dto{{.PackagePascalName}}.{{.FunctionName}}Req) (*dto{{.PackagePascalName}}.{{.FunctionName}}Resp, error) {
-    return &dto{{.PackagePascalName}}.{{.FunctionName}}Resp{}, nil
+func (svc *{{.ReceiverTypeName}}Svc) {{.FunctionName}}(c *gin.Context, req *dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req) (*dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp, error) {
+    return &dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp{}, nil
 }

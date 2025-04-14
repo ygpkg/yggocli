@@ -1,4 +1,4 @@
 package dto{{.PackagePascalName}}
 
-type {{.FunctionName}}Req struct {
+type {{.ReceiverTypePascalName}}{{.FunctionName}}Req struct {
 }

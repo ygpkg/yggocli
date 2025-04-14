@@ -52,14 +52,19 @@ func New{{.StructName}}Dao() *{{.StructName}}Dao {
 	return &{{.StructName}}Dao{}
 }
 
+func (dao *{{.StructName}}Dao) TableName() string {
+	return TblName{{.StructName}}
+}
+
 func (dao *{{.StructName}}Dao) WithTx(db *gorm.DB) *{{.StructName}}Dao {
-	dao.Tx = db
-	return dao
+	return &{{.StructName}}Dao{
+		Base: model.Base{Tx: db},
+	}
 }
 
 func (dao *{{.StructName}}Dao) Insert(c *gin.Context, entity *{{.StructName}}Entity) error {
 	db := dao.Db(c).Model(&{{.StructName}}Entity{})
-	db = db.Table(TblName{{.StructName}})
+	db = db.Table(dao.TableName())
 	if err := db.Create(entity).Error; err != nil {
 		return errorCode.ErrorDbInsert.Wrapf(err, "[{{.StructName}}Dao] Insert fail, entity:%s", gutils.ToJsonString(entity))
 	}
@@ -67,7 +72,12 @@ func (dao *{{.StructName}}Dao) Insert(c *gin.Context, entity *{{.StructName}}Ent
 }
 
 func (dao *{{.StructName}}Dao) BatchInsert(c *gin.Context, entityList {{.StructName}}EntityList) error {
-	db := dao.Db(c).Table(TblName{{.StructName}})
+    if len(entityList) == 0 {
+		return errorCode.ErrorDbInsert.Wrapf(nil, "[{{.StructName}}Dao] BatchInsert fail, entityList is empty")
+	}
+
+	db := dao.Db(c).Model(&{{.StructName}}Entity{})
+    db = db.Table(dao.TableName())
 	if err := db.Create(entityList).Error; err != nil {
 		return errorCode.ErrorDbInsert.Wrapf(err, "[{{.StructName}}Dao] BatchInsert fail, entityList:%s", gutils.ToJsonString(entityList))
 	}
@@ -76,7 +86,7 @@ func (dao *{{.StructName}}Dao) BatchInsert(c *gin.Context, entityList {{.StructN
 
 func (dao *{{.StructName}}Dao) Update(c *gin.Context, entity *{{.StructName}}Entity) error {
 	db := dao.Db(c).Model(&{{.StructName}}Entity{})
-	db = db.Table(TblName{{.StructName}})
+	db = db.Table(dao.TableName())
 	if err := db.Where("id = ?", entity.ID).Updates(entity).Error; err != nil {
 		return errorCode.ErrorDbUpdate.Wrapf(err, "[{{.StructName}}Dao] Update fail, entity:%s", gutils.ToJsonString(entity))
 	}
@@ -85,7 +95,7 @@ func (dao *{{.StructName}}Dao) Update(c *gin.Context, entity *{{.StructName}}Ent
 
 func (dao *{{.StructName}}Dao) UpdateMap(c *gin.Context, id uint64, updateMap map[string]interface{}) error {
 	db := dao.Db(c).Model(&{{.StructName}}Entity{})
-	db = db.Table(TblName{{.StructName}})
+	db = db.Table(dao.TableName())
 	if err := db.Where("id = ?", id).Updates(updateMap).Error; err != nil {
 		return errorCode.ErrorDbUpdate.Wrapf(err, "[{{.StructName}}Dao] UpdateMap fail, id:%d, updateMap:%s", id, gutils.ToJsonString(updateMap))
 	}
@@ -94,7 +104,7 @@ func (dao *{{.StructName}}Dao) UpdateMap(c *gin.Context, id uint64, updateMap ma
 
 func (dao *{{.StructName}}Dao) Delete(c *gin.Context, id, deletedBy uint64) error {
 	db := dao.Db(c).Model(&{{.StructName}}Entity{})
-	db = db.Table(TblName{{.StructName}})
+	db = db.Table(dao.TableName())
 	updatedField := map[string]interface{}{
 		"deleted_time": time.Now(),
 		"deleted_by": deletedBy,
@@ -108,7 +118,7 @@ func (dao *{{.StructName}}Dao) Delete(c *gin.Context, id, deletedBy uint64) erro
 func (dao *{{.StructName}}Dao) GetById(c *gin.Context, id uint64) (*{{.StructName}}Entity, error) {
 	var entity {{.StructName}}Entity
 	db := dao.Db(c).Model(&{{.StructName}}Entity{})
-	db = db.Table(TblName{{.StructName}})
+	db = db.Table(dao.TableName())
 	if err := db.Where("id = ?", id).Find(&entity).Error; err != nil {
 		return nil, errorCode.ErrorDbFind.Wrapf(err, "[{{.StructName}}Dao] GetById fail, id:%d", id)
 	}
@@ -118,7 +128,7 @@ func (dao *{{.StructName}}Dao) GetById(c *gin.Context, id uint64) (*{{.StructNam
 func (dao *{{.StructName}}Dao) GetByCond(c *gin.Context,cond *{{.StructName}}Cond) (*{{.StructName}}Entity, error) {
 	var entity {{.StructName}}Entity
 	db := dao.Db(c).Model(&{{.StructName}}Entity{})
-	db = db.Table(TblName{{.StructName}})
+	db = db.Table(dao.TableName())
 
 	dao.BuildCondition(db, cond)
 
@@ -131,7 +141,7 @@ func (dao *{{.StructName}}Dao) GetByCond(c *gin.Context,cond *{{.StructName}}Con
 func (dao *{{.StructName}}Dao) GetListByCond(c *gin.Context,cond *{{.StructName}}Cond) ({{.StructName}}EntityList, error) {
 	var entityList {{.StructName}}EntityList
 	db := dao.Db(c).Model(&{{.StructName}}Entity{})
-	db = db.Table(TblName{{.StructName}})
+	db = db.Table(dao.TableName())
 
 	dao.BuildCondition(db, cond)
 
@@ -143,7 +153,7 @@ func (dao *{{.StructName}}Dao) GetListByCond(c *gin.Context,cond *{{.StructName}
 
 func (dao *{{.StructName}}Dao) GetPageListByCond(c *gin.Context, cond *{{.StructName}}Cond) ({{.StructName}}EntityList, int64, error) {
 	db := dao.Db(c).Model(&{{.StructName}}Entity{})
-	db = db.Table(TblName{{.StructName}})
+	db = db.Table(dao.TableName())
 
 	dao.BuildCondition(db, cond)
 
@@ -171,7 +181,7 @@ func (l {{.StructName}}EntityList) ToMap() map[uint64]{{.StructName}}Entity {
 
 func (dao *{{.StructName}}Dao) CountByCond(c *gin.Context, cond *{{.StructName}}Cond) (int64, error) {
 	db := dao.Db(c).Model(&{{.StructName}}Entity{})
-	db = db.Table(TblName{{.StructName}})
+	db = db.Table(dao.TableName())
 
 	dao.BuildCondition(db, cond)
 	var count int64
