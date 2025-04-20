@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/morehao/go-tools/conf"
-	"github.com/morehao/go-tools/dbClient"
+	"github.com/morehao/go-tools/dbclient"
 	"github.com/morehao/go-tools/glog"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -41,7 +41,7 @@ var Cmd = &cobra.Command{
 
 		// 延迟初始化 Mysql 客户端
 		if MysqlClient == nil {
-			mysqlClient, getMysqlClientErr := dbClient.InitMysql(cfg.Mysql)
+			mysqlClient, getMysqlClientErr := dbclient.InitMysql(cfg.Mysql)
 			if getMysqlClientErr != nil {
 				panic("get mysql client error")
 			}

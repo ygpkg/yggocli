@@ -1,12 +1,12 @@
 package generate
 
 import (
-	"github.com/morehao/go-tools/dbClient"
+	"github.com/morehao/go-tools/dbclient"
 	"github.com/morehao/go-tools/glog"
 )
 
 type Config struct {
-	Mysql   dbClient.MysqlConfig `yaml:"mysql"`
+	Mysql   dbclient.MysqlConfig `yaml:"mysql"`
 	Log     glog.LoggerConfig    `yaml:"log"`
 	CodeGen CodeGen              `yaml:"code_gen"`
 }

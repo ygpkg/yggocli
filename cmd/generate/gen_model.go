@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/morehao/go-tools/codeGen"
+	"github.com/morehao/go-tools/codegen"
 	"github.com/morehao/go-tools/gutils"
 )
 
@@ -22,11 +22,11 @@ func genModel() error {
 	defer os.RemoveAll(tplDir)
 
 	rootDir := filepath.Join(workDir, modelGenCfg.InternalAppRootDir)
-	layerDirMap := map[codeGen.LayerName]string{
-		codeGen.LayerNameErrorCode: filepath.Join(rootDir, "/pkg"),
+	layerDirMap := map[codegen.LayerName]string{
+		codegen.LayerNameErrorCode: filepath.Join(rootDir, "/pkg"),
 	}
-	analysisCfg := &codeGen.ModuleCfg{
-		CommonConfig: codeGen.CommonConfig{
+	analysisCfg := &codegen.ModuleCfg{
+		CommonConfig: codegen.CommonConfig{
 			TplDir:      tplDir,
 			PackageName: modelGenCfg.PackageName,
 			RootDir:     rootDir,
@@ -37,13 +37,13 @@ func genModel() error {
 		},
 		TableName: modelGenCfg.TableName,
 	}
-	gen := codeGen.NewGenerator()
+	gen := codegen.NewGenerator()
 	analysisRes, analysisErr := gen.AnalysisModuleTpl(MysqlClient, analysisCfg)
 	if analysisErr != nil {
 		return fmt.Errorf("analysis model tpl error: %v", analysisErr)
 	}
 
-	var genParamsList []codeGen.GenParamsItem
+	var genParamsList []codegen.GenParamsItem
 	for _, v := range analysisRes.TplAnalysisList {
 		var modelFields []ModelField
 		for _, field := range v.ModelFields {
@@ -54,11 +54,11 @@ func genModel() error {
 				ColumnName:         field.ColumnName,
 				ColumnType:         field.ColumnType,
 				Comment:            field.Comment,
-				IsPrimaryKey:       field.ColumnKey == codeGen.ColumnKeyPRI,
+				IsPrimaryKey:       field.ColumnKey == codegen.ColumnKeyPRI,
 			})
 		}
 
-		genParamsList = append(genParamsList, codeGen.GenParamsItem{
+		genParamsList = append(genParamsList, codegen.GenParamsItem{
 			TargetDir:      v.TargetDir,
 			TargetFileName: v.TargetFilename,
 			Template:       v.Template,
@@ -75,7 +75,7 @@ func genModel() error {
 		})
 
 	}
-	genParams := &codeGen.GenParams{
+	genParams := &codegen.GenParams{
 		ParamsList: genParamsList,
 	}
 	if err := gen.Gen(genParams); err != nil {

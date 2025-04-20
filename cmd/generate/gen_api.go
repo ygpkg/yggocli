@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/morehao/go-tools/codeGen"
+	"github.com/morehao/go-tools/codegen"
 	"github.com/morehao/go-tools/gast"
 	"github.com/morehao/go-tools/gutils"
 )
@@ -24,11 +24,11 @@ func genApi() error {
 	defer os.RemoveAll(tplDir)
 
 	rootDir := filepath.Join(workDir, apiGenCfg.InternalAppRootDir)
-	layerDirMap := map[codeGen.LayerName]string{
-		codeGen.LayerNameErrorCode: filepath.Join(filepath.Dir(rootDir), "/pkg"),
+	layerDirMap := map[codegen.LayerName]string{
+		codegen.LayerNameErrorCode: filepath.Join(filepath.Dir(rootDir), "/pkg"),
 	}
-	analysisCfg := &codeGen.ApiCfg{
-		CommonConfig: codeGen.CommonConfig{
+	analysisCfg := &codegen.ApiCfg{
+		CommonConfig: codegen.CommonConfig{
 			TplDir:      tplDir,
 			PackageName: apiGenCfg.PackageName,
 			RootDir:     rootDir,
@@ -36,19 +36,19 @@ func genApi() error {
 		},
 		TargetFilename: apiGenCfg.TargetFilename,
 	}
-	gen := codeGen.NewGenerator()
+	gen := codegen.NewGenerator()
 	analysisRes, analysisErr := gen.AnalysisApiTpl(analysisCfg)
 	if analysisErr != nil {
 		return fmt.Errorf("analysis api tpl error: %v", analysisErr)
 	}
 	receiverTypePascalName := gutils.SnakeToPascal(apiGenCfg.SubModuleName)
 	receiverTypeName := gutils.FirstLetterToLower(receiverTypePascalName)
-	var genParamsList []codeGen.GenParamsItem
+	var genParamsList []codegen.GenParamsItem
 	var isNewRouter, isNewController bool
 	var controllerFilepath, serviceFilepath string
 	for _, v := range analysisRes.TplAnalysisList {
 		switch v.LayerName {
-		case codeGen.LayerNameRouter:
+		case codegen.LayerNameRouter:
 			if v.TargetFileExist {
 				goFilepath := filepath.Join(v.TargetDir, v.TargetFilename)
 				funcName := fmt.Sprintf("%sRouter", gutils.FirstLetterToLower(apiGenCfg.SubModuleName))
@@ -60,14 +60,14 @@ func genApi() error {
 			} else {
 				isNewRouter = true
 			}
-		case codeGen.LayerNameController:
+		case codegen.LayerNameController:
 			controllerFilepath = filepath.Join(v.TargetDir, v.TargetFilename)
 			isNewController = !v.TargetFileExist
-		case codeGen.LayerNameService:
+		case codegen.LayerNameService:
 			serviceFilepath = filepath.Join(v.TargetDir, v.TargetFilename)
 		}
 
-		genParamsList = append(genParamsList, codeGen.GenParamsItem{
+		genParamsList = append(genParamsList, codegen.GenParamsItem{
 			TargetDir:      v.TargetDir,
 			TargetFileName: v.TargetFilename,
 			Template:       v.Template,
@@ -91,7 +91,7 @@ func genApi() error {
 		})
 
 	}
-	genParams := &codeGen.GenParams{
+	genParams := &codegen.GenParams{
 		ParamsList: genParamsList,
 	}
 	if err := gen.Gen(genParams); err != nil {
