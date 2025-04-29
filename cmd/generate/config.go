@@ -1,21 +1,17 @@
 package generate
 
-import (
-	"github.com/morehao/go-tools/dbclient"
-	"github.com/morehao/go-tools/glog"
-)
-
 type Config struct {
-	Mysql   dbclient.MysqlConfig `yaml:"mysql"`
-	Log     glog.LoggerConfig    `yaml:"log"`
-	CodeGen CodeGen              `yaml:"code_gen"`
+	Mysql   string  `yaml:"mysql"` // MySQL 连接字符串
+	CodeGen CodeGen `yaml:"code_gen"`
 }
 
 type CodeGen struct {
-	Mode   string       `yaml:"mode"`   // 生成模式，支持：module、model、api
-	Module ModuleConfig `yaml:"module"` // 模块生成配置
-	Model  ModelConfig  `yaml:"model"`  // 模型生成配置
-	Api    ApiConfig    `yaml:"api"`    // 控制器生成配置
+	ServiceName string       `yaml:"service_name"` // 服务名
+	AppName     string       `yaml:"app_name"`     // 应用名
+	Mode        string       `yaml:"mode"`         // 生成模式，支持：module、model、api
+	Module      ModuleConfig `yaml:"module"`       // 模块生成配置
+	Model       ModelConfig  `yaml:"model"`        // 模型生成配置
+	Api         ApiConfig    `yaml:"api"`          // 控制器生成配置
 }
 
 type ModuleConfig struct {
@@ -30,11 +26,12 @@ type ModuleConfig struct {
 }
 
 type ModelConfig struct {
-	InternalAppRootDir string `yaml:"internal_app_root_dir"` // 项目内当前项目的根目录，如internal/genCode
-	ProjectRootDir     string `yaml:"project_root_dir"`      // import目录前缀
-	Description        string `yaml:"description"`           // 描述
-	PackageName        string `yaml:"package_name"`          // 包名
-	TableName          string `yaml:"table_name"`            // 表名
+	InternalAppRootDir string       `yaml:"internal_app_root_dir"` // 项目内当前项目的根目录，如internal/genCode
+	ProjectRootDir     string       `yaml:"project_root_dir"`      // import目录前缀
+	Description        string       `yaml:"description"`           // 描述
+	PackageName        string       `yaml:"package_name"`          // 包名
+	TableName          string       `yaml:"table_name"`            // 表名
+	ModelFields        []ModelField `yaml:"model_fields"`          // 模型字段定义
 }
 
 type ApiConfig struct {

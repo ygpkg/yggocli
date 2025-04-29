@@ -1,3 +1,11 @@
+/*
+ * @Author: morehao morehao@qq.com
+ * @Date: 2024-11-30 11:42:59
+ * @LastEditors: morehao morehao@qq.com
+ * @LastEditTime: 2025-04-29 19:46:07
+ * @FilePath: /gcli/cmd/generate/generate.go
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 package generate
 
 import (
@@ -7,10 +15,8 @@ import (
 	"path/filepath"
 
 	"github.com/morehao/go-tools/conf"
-	"github.com/morehao/go-tools/dbclient"
-	"github.com/morehao/go-tools/glog"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -33,15 +39,9 @@ var Cmd = &cobra.Command{
 			configFilepath := filepath.Join(workDir, "config", "config.yaml")
 			conf.LoadConfig(configFilepath, &cfg)
 		}
-
-		// 初始化日志
-		if err := glog.NewLogger(&cfg.Log, glog.WithZapOptions(zap.AddCallerSkip(3))); err != nil {
-			panic("glog initZapLogger error")
-		}
-
 		// 延迟初始化 Mysql 客户端
 		if MysqlClient == nil {
-			mysqlClient, getMysqlClientErr := dbclient.InitMysql(cfg.Mysql)
+			mysqlClient, getMysqlClientErr := gorm.Open(mysql.Open(cfg.Mysql), &gorm.Config{})
 			if getMysqlClientErr != nil {
 				panic("get mysql client error")
 			}
