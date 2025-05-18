@@ -9,7 +9,9 @@ import (
 )
 
 const (
-	TplFuncIsSysField = "isSysField"
+	TplFuncIsSysField          = "isSysField"
+	TplFuncIsDefaultModelLayer = "isDefaultModelLayer"
+	TplFuncIsDefaultDaoLayer   = "isDefaultDaoLayer"
 )
 
 func IsSysField(name string) bool {
@@ -24,6 +26,14 @@ func IsSysField(name string) bool {
 	}
 	_, ok := sysFieldMap[name]
 	return ok
+}
+
+func IsDefaultModelLayer(name string) bool {
+	return name == "model"
+}
+
+func IsDefaultDaoLayer(name string) bool {
+	return name == "dao"
 }
 
 // CopyEmbeddedTemplatesToTempDir 将嵌入的模板文件复制到临时目录，并返回该目录的路径。
@@ -66,4 +76,35 @@ func CopyEmbeddedTemplatesToTempDir(embeddedFS embed.FS, root string) (string, e
 	}
 
 	return tempDir, nil
+}
+
+// GetAppInfo 获取项目模块路径（包含项目根目录 + apps + 当前模块名）
+// 例如输入：/Users/morehao/xxx/go-gin-web/apps/demo
+// 返回：/Users/morehao/xxx/go-gin-web/apps/demo
+func GetAppInfo(workDir string) (*AppInfo, error) {
+	// 检查是否存在 internal 目录（确认是一个应用模块）
+	internalPath := filepath.Join(workDir, "internal")
+	info, err := os.Stat(internalPath)
+	if err != nil || !info.IsDir() {
+		return nil, fmt.Errorf("invalid module: %s does not contain internal/ directory", workDir)
+	}
+
+	// 向上追溯，找到 apps 目录
+	appsDir := filepath.Dir(workDir)
+	if filepath.Base(appsDir) != "apps" {
+		return nil, fmt.Errorf("invalid structure: %s is not under apps/", workDir)
+	}
+
+	// 找到项目根（apps 的上一级）
+	projectPath := filepath.Dir(appsDir)
+	projectName := filepath.Base(projectPath)
+
+	// 拼接最终路径：projectName/apps/appName
+	appName := filepath.Base(workDir)
+	projectAppPath := filepath.Join(projectName, "apps", appName)
+	return &AppInfo{
+		ProjectAppRelativePath: projectAppPath,
+		ProjectName:            projectName,
+		AppName:                appName,
+	}, nil
 }

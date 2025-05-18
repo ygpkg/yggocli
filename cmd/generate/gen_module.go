@@ -16,7 +16,7 @@ func genModule() error {
 	moduleGenCfg := cfg.Module
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
-	tplDir, err := CopyEmbeddedTemplatesToTempDir(templatesFS, "template/module")
+	tplDir, err := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/module")
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,34 @@
+mysql_dsn: root:123456@tcp(127.0.0.1:3306)/practice?charset=utf8mb4&parseTime=True&loc=Local
+layer_parent_dir_map:
+  model: model
+  dao: dao
+layer_name_map:
+  model: mysqlmodel
+  dao: mysqldao
+module:
+  internal_app_root_dir: internal/demo
+  project_root_dir: demo
+  description: 公司账户管理
+  api_doc_tag: 公司账户管理
+  api_group: companyAccount
+  api_prefix: /demo/companyAccount
+  package_name: companyAccount
+  table_name: company_account
+model:
+  description: 用户
+  package_name: user
+  table_name: user
+api:
+  internal_app_root_dir: internal/demo
+  project_root_dir: demo
+  description: 禁用公司账户
+  package_name: companyAccount
+  sub_module_name: companyAccount
+  target_filename: company_account.go
+  http_method: POST
+  function_name: Disable
+  api_doc_tag: 公司账户管理
+  api_group:  companyAccount
+  api_prefix: /demo/companyAccount/
+  api_suffix: disable
+

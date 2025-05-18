@@ -1,4 +1,4 @@
-package obj{{.PackagePascalName}}
+package obj{{.PackageName}}
 
 type {{.StructName}}BaseInfo struct {
 {{- range .ModelFields}}

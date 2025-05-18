@@ -14,7 +14,7 @@ func genModel() error {
 	modelGenCfg := cfg.Model
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
-	tplDir, err := CopyEmbeddedTemplatesToTempDir(templatesFS, "template/model")
+	tplDir, err := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/model")
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,9 @@ func genModel() error {
 			LayerNameMap:      cfg.LayerNameMap,
 			LayerPrefixMap:    cfg.LayerPrefixMap,
 			TplFuncMap: template.FuncMap{
-				TplFuncIsSysField: IsSysField,
+				TplFuncIsSysField:          IsSysField,
+				TplFuncIsDefaultModelLayer: IsDefaultModelLayer,
+				TplFuncIsDefaultDaoLayer:   IsDefaultDaoLayer,
 			},
 		},
 		TableName: modelGenCfg.TableName,
@@ -40,6 +42,16 @@ func genModel() error {
 	analysisRes, analysisErr := gen.AnalysisModuleTpl(MysqlClient, analysisCfg)
 	if analysisErr != nil {
 		return fmt.Errorf("analysis model tpl error: %v", analysisErr)
+	}
+
+	var modelLayerName, daoLayerName codegen.LayerName
+	for _, v := range analysisRes.TplAnalysisList {
+		if v.OriginLayerName == codegen.LayerNameModel {
+			modelLayerName = v.LayerName
+		}
+		if v.OriginLayerName == codegen.LayerNameDao {
+			daoLayerName = v.LayerName
+		}
 	}
 
 	var genParamsList []codegen.GenParamsItem
@@ -62,9 +74,15 @@ func genModel() error {
 			TargetFileName: v.TargetFilename,
 			Template:       v.Template,
 			ExtraParams: ModelExtraParams{
+				AppInfo: AppInfo{
+					ProjectName:            cfg.appInfo.ProjectName,
+					ProjectAppRelativePath: cfg.appInfo.ProjectAppRelativePath,
+					AppName:                cfg.appInfo.AppName,
+				},
 				PackageName:    analysisRes.PackageName,
-				ProjectRootDir: modelGenCfg.ProjectRootDir,
 				TableName:      analysisRes.TableName,
+				ModelLayerName: string(modelLayerName),
+				DaoLayerName:   string(daoLayerName),
 				Description:    modelGenCfg.Description,
 				StructName:     analysisRes.StructName,
 				Template:       v.Template,
@@ -93,13 +111,13 @@ type ModelField struct {
 }
 
 type ModelExtraParams struct {
-	ServiceName       string
-	ProjectRootDir    string
-	PackageName       string
-	PackagePascalName string
-	TableName         string
-	Description       string
-	StructName        string
-	Template          *template.Template
-	ModelFields       []ModelField
+	AppInfo
+	PackageName    string
+	ModelLayerName string
+	DaoLayerName   string
+	TableName      string
+	Description    string
+	StructName     string
+	Template       *template.Template
+	ModelFields    []ModelField
 }

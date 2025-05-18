@@ -10,6 +10,13 @@ type Config struct {
 	Module            ModuleConfig                              `yaml:"module"`               // 模块生成配置
 	Model             ModelConfig                               `yaml:"model"`                // 模型生成配置
 	Api               ApiConfig                                 `yaml:"api"`                  // 控制器生成配置
+	appInfo           AppInfo
+}
+
+type AppInfo struct {
+	ProjectAppRelativePath string
+	ProjectName            string
+	AppName                string
 }
 
 type CodeGen struct {

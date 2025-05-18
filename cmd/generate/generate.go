@@ -2,7 +2,7 @@
  * @Author: morehao morehao@qq.com
  * @Date: 2024-11-30 11:42:59
  * @LastEditors: morehao morehao@qq.com
- * @LastEditTime: 2025-04-29 19:46:07
+ * @LastEditTime: 2025-05-18 21:09:10
  * @FilePath: /gcli/cmd/generate/generate.go
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -21,7 +21,7 @@ import (
 )
 
 //go:embed template
-var templatesFS embed.FS
+var TemplatesFS embed.FS
 
 var workDir string
 var cfg *Config
@@ -34,10 +34,15 @@ var Cmd = &cobra.Command{
 	Long:  `Generate code for different layers like module, model, and API based on predefined templates.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// 初始化配置和 MySQL 客户端
+		workDir, _ := os.Getwd()
 		if cfg == nil {
-			workDir, _ := os.Getwd()
 			configFilepath := filepath.Join(workDir, "config", "code_gen.yaml")
 			conf.LoadConfig(configFilepath, &cfg)
+			appInfo, getAppInfoErr := GetAppInfo(workDir)
+			if getAppInfoErr != nil {
+				panic("get app info error")
+			}
+			cfg.appInfo = *appInfo
 		}
 		// 延迟初始化 Mysql 客户端
 		if MysqlClient == nil {
@@ -49,7 +54,6 @@ var Cmd = &cobra.Command{
 		}
 
 		mode, _ := cmd.Flags().GetString("mode")
-		workDir, _ := os.Getwd()
 
 		if workDir == "" {
 			fmt.Println("Please provide a working directory using --workdir flag")

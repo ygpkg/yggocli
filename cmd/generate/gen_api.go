@@ -16,7 +16,7 @@ func genApi() error {
 	apiGenCfg := cfg.Api
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
-	tplDir, err := CopyEmbeddedTemplatesToTempDir(templatesFS, "template/api")
+	tplDir, err := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/api")
 	if err != nil {
 		return err
 	}
