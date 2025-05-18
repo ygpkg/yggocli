@@ -1,6 +1,6 @@
 package main
 
-import "github.com/morehao/gcli/cmd"
+import "github.com/morehao/gocli/cmd"
 
 func main() {
 	cmd.Execute()

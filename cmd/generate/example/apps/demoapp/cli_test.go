@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/morehao/gcli/cmd/generate"
+	"github.com/morehao/gocli/cmd/generate"
 	"github.com/stretchr/testify/assert"
 )
 
