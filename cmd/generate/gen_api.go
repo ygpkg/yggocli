@@ -7,13 +7,13 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/morehao/go-tools/codegen"
-	"github.com/morehao/go-tools/gast"
-	"github.com/morehao/go-tools/gutils"
+	"github.com/morehao/golib/codegen"
+	"github.com/morehao/golib/gast"
+	"github.com/morehao/golib/gutils"
 )
 
 func genApi() error {
-	apiGenCfg := cfg.CodeGen.Api
+	apiGenCfg := cfg.Api
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
 	tplDir, err := CopyEmbeddedTemplatesToTempDir(templatesFS, "template/api")
@@ -24,15 +24,14 @@ func genApi() error {
 	defer os.RemoveAll(tplDir)
 
 	rootDir := filepath.Join(workDir, apiGenCfg.InternalAppRootDir)
-	layerDirMap := map[codegen.LayerName]string{
-		codegen.LayerNameErrorCode: filepath.Join(filepath.Dir(rootDir), "/pkg"),
-	}
 	analysisCfg := &codegen.ApiCfg{
 		CommonConfig: codegen.CommonConfig{
-			TplDir:      tplDir,
-			PackageName: apiGenCfg.PackageName,
-			RootDir:     rootDir,
-			LayerDirMap: layerDirMap,
+			TplDir:            tplDir,
+			PackageName:       apiGenCfg.PackageName,
+			RootDir:           rootDir,
+			LayerParentDirMap: cfg.LayerParentDirMap,
+			LayerNameMap:      cfg.LayerNameMap,
+			LayerPrefixMap:    cfg.LayerPrefixMap,
 		},
 		TargetFilename: apiGenCfg.TargetFilename,
 	}
@@ -73,7 +72,6 @@ func genApi() error {
 			Template:       v.Template,
 			ExtraParams: ApiExtraParams{
 				PackageName:            analysisRes.PackageName,
-				PackagePascalName:      analysisRes.PackagePascalName,
 				ProjectRootDir:         apiGenCfg.ProjectRootDir,
 				TargetFileExist:        v.TargetFileExist,
 				IsNewRouter:            isNewRouter,

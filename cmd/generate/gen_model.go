@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/morehao/go-tools/codegen"
-	"github.com/morehao/go-tools/gutils"
+	"github.com/morehao/golib/codegen"
+	"github.com/morehao/golib/gutils"
 )
 
 func genModel() error {
-	modelGenCfg := cfg.CodeGen.Model
+	modelGenCfg := cfg.Model
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
 	tplDir, err := CopyEmbeddedTemplatesToTempDir(templatesFS, "template/model")
@@ -21,16 +21,15 @@ func genModel() error {
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
 
-	rootDir := filepath.Join(workDir, modelGenCfg.InternalAppRootDir)
-	layerDirMap := map[codegen.LayerName]string{
-		codegen.LayerNameErrorCode: filepath.Join(rootDir, "/pkg"),
-	}
+	rootDir := filepath.Join(workDir, "internal")
 	analysisCfg := &codegen.ModuleCfg{
 		CommonConfig: codegen.CommonConfig{
-			TplDir:      tplDir,
-			PackageName: modelGenCfg.PackageName,
-			RootDir:     rootDir,
-			LayerDirMap: layerDirMap,
+			TplDir:            tplDir,
+			PackageName:       modelGenCfg.PackageName,
+			RootDir:           rootDir,
+			LayerParentDirMap: cfg.LayerParentDirMap,
+			LayerNameMap:      cfg.LayerNameMap,
+			LayerPrefixMap:    cfg.LayerPrefixMap,
 			TplFuncMap: template.FuncMap{
 				TplFuncIsSysField: IsSysField,
 			},
@@ -63,14 +62,13 @@ func genModel() error {
 			TargetFileName: v.TargetFilename,
 			Template:       v.Template,
 			ExtraParams: ModelExtraParams{
-				PackageName:       analysisRes.PackageName,
-				PackagePascalName: analysisRes.PackagePascalName,
-				ProjectRootDir:    modelGenCfg.ProjectRootDir,
-				TableName:         analysisRes.TableName,
-				Description:       modelGenCfg.Description,
-				StructName:        analysisRes.StructName,
-				Template:          v.Template,
-				ModelFields:       modelFields,
+				PackageName:    analysisRes.PackageName,
+				ProjectRootDir: modelGenCfg.ProjectRootDir,
+				TableName:      analysisRes.TableName,
+				Description:    modelGenCfg.Description,
+				StructName:     analysisRes.StructName,
+				Template:       v.Template,
+				ModelFields:    modelFields,
 			},
 		})
 

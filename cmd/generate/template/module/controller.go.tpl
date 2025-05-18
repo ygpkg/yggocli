@@ -5,7 +5,7 @@ import (
 	"{{.ProjectRootDir}}/internal/app/service/svc{{.PackagePascalName}}"
 
 	"github.com/gin-gonic/gin"
-	"github.com/morehao/go-tools/gcontext/ginRender"
+	"github.com/morehao/golib/gcontext/ginRender"
 )
 
 type {{.ReceiverTypePascalName}}Ctr interface {

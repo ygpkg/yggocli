@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/morehao/go-tools/glog"
-	"github.com/morehao/go-tools/gutils"
+	"github.com/morehao/golib/glog"
+	"github.com/morehao/golib/gutils"
 )
 
 type {{.ReceiverTypePascalName}}Svc interface {

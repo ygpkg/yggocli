@@ -8,7 +8,7 @@ import (
 	"{{.ProjectRootDir}}/internal/pkg/errorCode"
 
 	"github.com/gin-gonic/gin"
-	"github.com/morehao/go-tools/gutils"
+	"github.com/morehao/golib/gutils"
 	"gorm.io/gorm"
 )
 

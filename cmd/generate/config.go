@@ -1,8 +1,15 @@
 package generate
 
+import "github.com/morehao/golib/codegen"
+
 type Config struct {
-	Mysql   string  `yaml:"mysql"` // MySQL 连接字符串
-	CodeGen CodeGen `yaml:"code_gen"`
+	MysqlDSN          string                                    `yaml:"mysql_dsn"`            // MySQL 连接字符串
+	LayerParentDirMap map[codegen.LayerName]string              `yaml:"layer_parent_dir_map"` // 模块父目录映射
+	LayerNameMap      map[codegen.LayerName]codegen.LayerName   `yaml:"layer_name_map"`       // 模块层名称映射
+	LayerPrefixMap    map[codegen.LayerName]codegen.LayerPrefix `yaml:"layer_prefix_map"`     // 模块层前缀映射
+	Module            ModuleConfig                              `yaml:"module"`               // 模块生成配置
+	Model             ModelConfig                               `yaml:"model"`                // 模型生成配置
+	Api               ApiConfig                                 `yaml:"api"`                  // 控制器生成配置
 }
 
 type CodeGen struct {

@@ -3,11 +3,14 @@ module github.com/morehao/gcli
 go 1.23.3
 
 require (
-	github.com/morehao/go-tools v1.2.8
+	github.com/morehao/golib v1.2.9
 	github.com/spf13/cobra v1.8.1
 	go.uber.org/zap v1.27.0
+	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
 )
+
+replace github.com/morehao/golib => /Users/morehao/Documents/practice/go/golib
 
 require (
 	github.com/bytedance/sonic v1.13.2 // indirect
@@ -46,5 +49,4 @@ require (
 	golang.org/x/text v0.22.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/mysql v1.5.7 // indirect
 )

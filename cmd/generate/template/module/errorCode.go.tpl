@@ -1,6 +1,6 @@
 package errorCode
 
-import "github.com/morehao/go-tools/gerror"
+import "github.com/morehao/golib/gerror"
 
 var {{.StructName}}CreateErr = gerror.Error{
 	Code: 100100,

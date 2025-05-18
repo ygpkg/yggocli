@@ -14,7 +14,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/morehao/go-tools/conf"
+	"github.com/morehao/golib/conf"
 	"github.com/spf13/cobra"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -36,12 +36,12 @@ var Cmd = &cobra.Command{
 		// 初始化配置和 MySQL 客户端
 		if cfg == nil {
 			workDir, _ := os.Getwd()
-			configFilepath := filepath.Join(workDir, "config", "config.yaml")
+			configFilepath := filepath.Join(workDir, "config", "code_gen.yaml")
 			conf.LoadConfig(configFilepath, &cfg)
 		}
 		// 延迟初始化 Mysql 客户端
 		if MysqlClient == nil {
-			mysqlClient, getMysqlClientErr := gorm.Open(mysql.Open(cfg.Mysql), &gorm.Config{})
+			mysqlClient, getMysqlClientErr := gorm.Open(mysql.Open(cfg.MysqlDSN), &gorm.Config{})
 			if getMysqlClientErr != nil {
 				panic("get mysql client error")
 			}

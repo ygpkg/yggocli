@@ -4,7 +4,6 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -54,7 +53,7 @@ func CopyEmbeddedTemplatesToTempDir(embeddedFS embed.FS, root string) (string, e
 			if mkDirErr := os.MkdirAll(filepath.Dir(targetPath), 0755); mkDirErr != nil {
 				return mkDirErr
 			}
-			if writeErr := ioutil.WriteFile(targetPath, data, 0644); writeErr != nil {
+			if writeErr := os.WriteFile(targetPath, data, 0644); writeErr != nil {
 				return writeErr
 			}
 		}
