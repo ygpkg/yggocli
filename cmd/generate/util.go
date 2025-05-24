@@ -10,14 +10,26 @@ import (
 )
 
 const (
+	TplFuncIsBuiltInField      = "isBuiltInField"
 	TplFuncIsSysField          = "isSysField"
 	TplFuncIsDefaultModelLayer = "isDefaultModelLayer"
 	TplFuncIsDefaultDaoLayer   = "isDefaultDaoLayer"
 )
 
+func IsBuiltInField(name string) bool {
+	buildInFieldMap := map[string]struct{}{
+		"ID":        {},
+		"CreatedAt": {},
+		"UpdatedAt": {},
+		"DeletedAt": {},
+	}
+	_, ok := buildInFieldMap[name]
+	return ok
+}
+
 func IsSysField(name string) bool {
 	sysFieldMap := map[string]struct{}{
-		"Id":        {},
+		"ID":        {},
 		"CreatedAt": {},
 		"CreatedBy": {},
 		"UpdatedAt": {},

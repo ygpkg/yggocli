@@ -23,12 +23,11 @@ func genApi() error {
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
 
-	rootDir := filepath.Join(workDir, apiGenCfg.InternalAppRootDir)
 	analysisCfg := &codegen.ApiCfg{
 		CommonConfig: codegen.CommonConfig{
-			TplDir:            tplDir,
 			PackageName:       apiGenCfg.PackageName,
-			RootDir:           rootDir,
+			TplDir:            tplDir,
+			RootDir:           workDir,
 			LayerParentDirMap: cfg.LayerParentDirMap,
 			LayerNameMap:      cfg.LayerNameMap,
 			LayerPrefixMap:    cfg.LayerPrefixMap,
@@ -111,13 +110,13 @@ func genApi() error {
 	// 	注册路由
 	if isNewRouter {
 		routerCallContent := fmt.Sprintf("%sRouter(routerGroup)", receiverTypeName)
-		routerEnterFilepath := filepath.Join(rootDir, "/router/enter.go")
+		routerEnterFilepath := filepath.Join(workDir, "/router/enter.go")
 		if err := gast.AddContentToFunc(routerEnterFilepath, "RegisterRouter", routerCallContent); err != nil {
 			return fmt.Errorf("new router appendContentToFunc error: %v", err)
 		}
 	} else {
 		routerCallContent := fmt.Sprintf(`routerGroup.%s("/%s", %sCtr.%s) // %s`, apiGenCfg.HttpMethod, apiGenCfg.ApiSuffix, receiverTypeName, apiGenCfg.FunctionName, apiGenCfg.Description)
-		routerEnterFilepath := filepath.Join(rootDir, fmt.Sprintf("/router/%s.go", gutils.TrimFileExtension(apiGenCfg.TargetFilename)))
+		routerEnterFilepath := filepath.Join(workDir, fmt.Sprintf("/router/%s.go", gutils.TrimFileExtension(apiGenCfg.TargetFilename)))
 		if err := gast.AddContentToFuncWithLineNumber(routerEnterFilepath, fmt.Sprintf("%sRouter", receiverTypeName), routerCallContent, -2); err != nil {
 			return fmt.Errorf("appendContentToFunc error: %v", err)
 		}

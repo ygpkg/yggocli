@@ -8,12 +8,11 @@ import (
 
 // {{.StructName}}Entity {{.Description}}表结构体
 type {{.StructName}}Entity struct {
+    gorm.Model
 {{- range .ModelFields}}
-	{{- if .IsPrimaryKey}}
-	{{.FieldName}} uint64 `gorm:"column:{{.ColumnName}};comment:{{.Comment}};primaryKey"`
-	{{- else if eq .FieldName "DeletedAt"}}
-	{{.FieldName}} gorm.DeletedAt `gorm:"column:{{.ColumnName}};comment:{{.Comment}}"`
-	{{- else}}
+    {{- if isBuiltInField .FieldName}}
+        {{- continue}}
+    {{- else}}
 	{{.FieldName}} {{.FieldType}} `gorm:"column:{{.ColumnName}};comment:{{.Comment}}"`
 	{{- end}}
 {{- end}}
@@ -27,8 +26,8 @@ func ({{.StructName}}Entity ) TableName() string {
   return TblName{{.StructName}}
 }
 
-func (l {{.StructName}}EntityList) ToMap() map[uint64]{{.StructName}}Entity {
-	m := make(map[uint64]{{.StructName}}Entity)
+func (l {{.StructName}}EntityList) ToMap() map[uint]{{.StructName}}Entity {
+	m := make(map[uint]{{.StructName}}Entity)
 	for _, v := range l {
 		m[v.ID] = v
 	}

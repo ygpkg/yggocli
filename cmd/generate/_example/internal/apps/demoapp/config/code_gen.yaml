@@ -6,17 +6,15 @@ mysql_dsn: root:123456@tcp(127.0.0.1:3306)/practice?charset=utf8mb4&parseTime=Tr
 #  model: mysqlmodel
 #  dao: mysqldao
 module:
-  internal_app_root_dir: internal/demo
-  project_root_dir: demo
-  description: 公司账户管理
-  api_doc_tag: 公司账户管理
-  api_group: companyAccount
-  api_prefix: /demo/companyAccount
-  package_name: companyAccount
-  table_name: company_account
-model:
-  description: 用户
   package_name: user
+  description: 用户
+  table_name: user
+  api_doc_tag: 用户管理
+  api_group: user
+  api_prefix: /user
+model:
+  package_name: user
+  description: 用户
   table_name: user
 api:
   internal_app_root_dir: internal/demo

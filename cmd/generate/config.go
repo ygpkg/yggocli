@@ -30,23 +30,18 @@ type CodeGen struct {
 }
 
 type ModuleConfig struct {
-	InternalAppRootDir string `yaml:"internal_app_root_dir"` // 项目内当前项目的根目录，如internal/genCode
-	ProjectRootDir     string `yaml:"project_root_dir"`      // 项目根目录，如go-gin-web
-	Description        string `yaml:"description"`           // 描述
-	ApiDocTag          string `yaml:"api_doc_tag"`           // api文档tag
-	ApiGroup           string `yaml:"api_group"`             // api分组
-	ApiPrefix          string `yaml:"api_prefix"`            // api前缀
-	PackageName        string `yaml:"package_name"`          // 包名
-	TableName          string `yaml:"table_name"`            // 表名
+	PackageName string `yaml:"package_name"` // 包名
+	Description string `yaml:"description"`  // 描述
+	TableName   string `yaml:"table_name"`   // 表名
+	ApiDocTag   string `yaml:"api_doc_tag"`  // api文档tag
+	ApiGroup    string `yaml:"api_group"`    // api分组
+	ApiPrefix   string `yaml:"api_prefix"`   // api前缀
 }
 
 type ModelConfig struct {
-	InternalAppRootDir string       `yaml:"internal_app_root_dir"` // 项目内当前项目的根目录，如internal/genCode
-	ProjectRootDir     string       `yaml:"project_root_dir"`      // import目录前缀
-	Description        string       `yaml:"description"`           // 描述
-	PackageName        string       `yaml:"package_name"`          // 包名
-	TableName          string       `yaml:"table_name"`            // 表名
-	ModelFields        []ModelField `yaml:"model_fields"`          // 模型字段定义
+	PackageName string `yaml:"package_name"` // 包名
+	Description string `yaml:"description"`  // 描述
+	TableName   string `yaml:"table_name"`   // 表名
 }
 
 type ApiConfig struct {

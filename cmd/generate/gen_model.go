@@ -19,16 +19,17 @@ func genModel() error {
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
-	
+
 	analysisCfg := &codegen.ModuleCfg{
 		CommonConfig: codegen.CommonConfig{
-			TplDir:            tplDir,
 			PackageName:       modelGenCfg.PackageName,
+			TplDir:            tplDir,
 			RootDir:           workDir,
 			LayerParentDirMap: cfg.LayerParentDirMap,
 			LayerNameMap:      cfg.LayerNameMap,
 			LayerPrefixMap:    cfg.LayerPrefixMap,
 			TplFuncMap: template.FuncMap{
+				TplFuncIsBuiltInField:      IsBuiltInField,
 				TplFuncIsSysField:          IsSysField,
 				TplFuncIsDefaultModelLayer: IsDefaultModelLayer,
 				TplFuncIsDefaultDaoLayer:   IsDefaultDaoLayer,

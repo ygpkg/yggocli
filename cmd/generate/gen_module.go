@@ -23,12 +23,11 @@ func genModule() error {
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
 
-	rootDir := filepath.Join(workDir, moduleGenCfg.InternalAppRootDir)
 	analysisCfg := &codegen.ModuleCfg{
 		CommonConfig: codegen.CommonConfig{
-			TplDir:            tplDir,
 			PackageName:       moduleGenCfg.PackageName,
-			RootDir:           rootDir,
+			TplDir:            tplDir,
+			RootDir:           workDir,
 			LayerParentDirMap: cfg.LayerParentDirMap,
 			LayerNameMap:      cfg.LayerNameMap,
 			LayerPrefixMap:    cfg.LayerPrefixMap,
@@ -65,7 +64,7 @@ func genModule() error {
 			Template:       v.Template,
 			ExtraParams: ModuleExtraParams{
 				PackageName:            analysisRes.PackageName,
-				ProjectRootDir:         moduleGenCfg.ProjectRootDir,
+				ProjectRootDir:         workDir,
 				TableName:              analysisRes.TableName,
 				Description:            moduleGenCfg.Description,
 				StructName:             analysisRes.StructName,
@@ -89,7 +88,7 @@ func genModule() error {
 
 	// 注册路由
 	routerCallContent := fmt.Sprintf("%sRouter(routerGroup)", gutils.FirstLetterToLower(analysisRes.StructName))
-	routerEnterFilepath := filepath.Join(rootDir, "/router/enter.go")
+	routerEnterFilepath := filepath.Join(workDir, "/router/enter.go")
 	if err := gast.AddContentToFunc(routerEnterFilepath, "RegisterRouter", routerCallContent); err != nil {
 		return fmt.Errorf("appendContentToFunc error: %v", err)
 	}
