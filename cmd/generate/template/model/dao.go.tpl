@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 	
-    "{{.ProjectAppRelativePath}}/internal/code"
+    "{{.AppPathInProject}}/code"
     {{- if isDefaultModelLayer .ModelLayerName}}
-    "{{.ProjectAppRelativePath}}/internal/model"
+    "{{.AppPathInProject}}/model"
     {{- else}}
-    "{{.ProjectAppRelativePath}}/internal/model/{{.ModelLayerName}}"
+    "{{.AppPathInProject}}/model/{{.ModelLayerName}}"
     {{- end}}
 
     "github.com/gin-gonic/gin"

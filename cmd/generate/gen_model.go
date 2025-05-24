@@ -3,7 +3,6 @@ package generate
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"text/template"
 
 	"github.com/morehao/golib/codegen"
@@ -20,13 +19,12 @@ func genModel() error {
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
-
-	rootDir := filepath.Join(workDir, "internal")
+	
 	analysisCfg := &codegen.ModuleCfg{
 		CommonConfig: codegen.CommonConfig{
 			TplDir:            tplDir,
 			PackageName:       modelGenCfg.PackageName,
-			RootDir:           rootDir,
+			RootDir:           workDir,
 			LayerParentDirMap: cfg.LayerParentDirMap,
 			LayerNameMap:      cfg.LayerNameMap,
 			LayerPrefixMap:    cfg.LayerPrefixMap,
@@ -75,9 +73,9 @@ func genModel() error {
 			Template:       v.Template,
 			ExtraParams: ModelExtraParams{
 				AppInfo: AppInfo{
-					ProjectName:            cfg.appInfo.ProjectName,
-					ProjectAppRelativePath: cfg.appInfo.ProjectAppRelativePath,
-					AppName:                cfg.appInfo.AppName,
+					ProjectName:      cfg.appInfo.ProjectName,
+					AppPathInProject: cfg.appInfo.AppPathInProject,
+					AppName:          cfg.appInfo.AppName,
 				},
 				PackageName:    analysisRes.PackageName,
 				TableName:      analysisRes.TableName,

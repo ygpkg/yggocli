@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -78,33 +79,36 @@ func CopyEmbeddedTemplatesToTempDir(embeddedFS embed.FS, root string) (string, e
 	return tempDir, nil
 }
 
-// GetAppInfo 获取项目模块路径（包含项目根目录 + apps + 当前模块名）
-// 例如输入：/Users/morehao/xxx/go-gin-web/apps/demo
-// 返回：/Users/morehao/xxx/go-gin-web/apps/demo
+// GetAppInfo 应用模块路径信息
+// 输入示例：/Users/morehao/xxx/go-gin-web/internal/apps/demo
 func GetAppInfo(workDir string) (*AppInfo, error) {
-	// 检查是否存在 internal 目录（确认是一个应用模块）
-	internalPath := filepath.Join(workDir, "internal")
-	info, err := os.Stat(internalPath)
-	if err != nil || !info.IsDir() {
-		return nil, fmt.Errorf("invalid module: %s does not contain internal/ directory", workDir)
+	cleanPath := filepath.Clean(workDir)
+	segments := strings.Split(cleanPath, string(filepath.Separator))
+
+	// 查找 "internal/apps/{appName}" 结构
+	var internalIndex = -1
+	for i := 0; i < len(segments)-2; i++ {
+		if segments[i] == "internal" && segments[i+1] == "apps" {
+			internalIndex = i
+			break
+		}
+	}
+	if internalIndex == -1 {
+		return nil, fmt.Errorf("invalid structure: path does not contain /internal/apps/{appName}")
 	}
 
-	// 向上追溯，找到 apps 目录
-	appsDir := filepath.Dir(workDir)
-	if filepath.Base(appsDir) != "apps" {
-		return nil, fmt.Errorf("invalid structure: %s is not under apps/", workDir)
+	// 解析项目名、app名、相对路径
+	projectNameIndex := internalIndex - 1
+	if projectNameIndex < 0 {
+		return nil, fmt.Errorf("cannot determine project name from path: %s", workDir)
 	}
+	projectName := segments[projectNameIndex]
+	appName := segments[internalIndex+2]
+	appPathInProject := filepath.Join(projectName, "internal", "apps", appName)
 
-	// 找到项目根（apps 的上一级）
-	projectPath := filepath.Dir(appsDir)
-	projectName := filepath.Base(projectPath)
-
-	// 拼接最终路径：projectName/apps/appName
-	appName := filepath.Base(workDir)
-	projectAppPath := filepath.Join(projectName, "apps", appName)
 	return &AppInfo{
-		ProjectAppRelativePath: projectAppPath,
-		ProjectName:            projectName,
-		AppName:                appName,
+		AppPathInProject: appPathInProject,
+		ProjectName:      projectName,
+		AppName:          appName,
 	}, nil
 }

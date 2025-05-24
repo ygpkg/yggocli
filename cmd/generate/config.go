@@ -13,10 +13,11 @@ type Config struct {
 	appInfo           AppInfo
 }
 
+// AppInfo 应用信息，示例路径：go-gin-web/internal/apps/demoapp
 type AppInfo struct {
-	ProjectAppRelativePath string
-	ProjectName            string
-	AppName                string
+	AppPathInProject string // go-gin-web/internal/apps/demoapp
+	ProjectName      string // go-gin-web
+	AppName          string // demoapp
 }
 
 type CodeGen struct {

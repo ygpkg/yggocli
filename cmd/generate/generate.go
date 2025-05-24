@@ -34,7 +34,8 @@ var Cmd = &cobra.Command{
 	Long:  `Generate code for different layers like module, model, and API based on predefined templates.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// 初始化配置和 MySQL 客户端
-		workDir, _ := os.Getwd()
+		currentDir, _ := os.Getwd()
+		workDir = currentDir
 		if cfg == nil {
 			configFilepath := filepath.Join(workDir, "config", "code_gen.yaml")
 			conf.LoadConfig(configFilepath, &cfg)
