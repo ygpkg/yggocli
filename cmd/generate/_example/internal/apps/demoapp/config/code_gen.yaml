@@ -10,8 +10,6 @@ module:
   description: 用户
   table_name: user
   api_doc_tag: 用户管理
-  api_group: user
-  api_prefix: /user
 model:
   package_name: user
   description: 用户

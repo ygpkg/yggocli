@@ -1,20 +1,20 @@
 package router
 
 import (
-	"{{.ProjectRootDir}}/internal/app/controller/ctr{{.PackagePascalName}}"
+	"{{.AppPathInProject}}/controller/ctr{{.PackageName}}"
 
 	"github.com/gin-gonic/gin"
 )
 
-// {{.ReceiverTypeName}}Router 初始化{{.Description}}路由信息
-func {{.ReceiverTypeName}}Router(routerGroup *gin.RouterGroup) {
-	{{.ReceiverTypeName}}Ctr := ctr{{.PackagePascalName}}.New{{.ReceiverTypePascalName}}Ctr()
-	{{.ReceiverTypeName}}Group := routerGroup.Group("{{.ApiGroup}}")
+// {{.PackageName}}Router 初始化{{.Description}}路由信息
+func {{.PackageName}}Router(routerGroup *gin.RouterGroup) {
+	{{.PackageName}}Ctr := ctr{{.PackageName}}.New{{.StructName}}Ctr()
+	{{.PackageName}}Group := routerGroup.Group("{{.PackageName}}")
 	{
-		{{.ReceiverTypeName}}Group.POST("create", {{.ReceiverTypeName}}Ctr.Create)   // 新建{{.Description}}
-		{{.ReceiverTypeName}}Group.POST("delete", {{.ReceiverTypeName}}Ctr.Delete)   // 删除{{.Description}}
-		{{.ReceiverTypeName}}Group.POST("update", {{.ReceiverTypeName}}Ctr.Update)   // 更新{{.Description}}
-		{{.ReceiverTypeName}}Group.GET("detail", {{.ReceiverTypeName}}Ctr.Detail)    // 根据ID获取{{.Description}}
-        {{.ReceiverTypeName}}Group.GET("pageList", {{.ReceiverTypeName}}Ctr.PageList)  // 获取{{.Description}}列表
+		{{.PackageName}}Group.POST("create", {{.PackageName}}Ctr.Create)   // 新建{{.Description}}
+		{{.PackageName}}Group.POST("delete", {{.PackageName}}Ctr.Delete)   // 删除{{.Description}}
+		{{.PackageName}}Group.POST("update", {{.PackageName}}Ctr.Update)   // 更新{{.Description}}
+		{{.PackageName}}Group.GET("detail", {{.PackageName}}Ctr.Detail)    // 根据ID获取{{.Description}}
+        {{.PackageName}}Group.GET("pageList", {{.PackageName}}Ctr.PageList)  // 获取{{.Description}}列表
 	}
 }

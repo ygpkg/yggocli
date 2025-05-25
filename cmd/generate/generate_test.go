@@ -1,11 +1,9 @@
 package generate
 
 import (
-	"bytes"
 	"testing"
 
 	"github.com/morehao/golib/gutils"
-	"github.com/spf13/cobra"
 )
 
 // 测试模板文件加载
@@ -25,33 +23,12 @@ func TestLoadTemplates(t *testing.T) {
 	}
 }
 
-// 辅助函数：执行命令并捕获输出
-func executeCommand(root *cobra.Command, args ...string) (output string, err error) {
-	buf := new(bytes.Buffer)
-	root.SetOut(buf)
-	root.SetErr(buf)
-	root.SetArgs(args)
-	err = root.Execute()
-	return buf.String(), err
-}
-
 // 测试配置加载
 func TestConfigLoading(t *testing.T) {
 	// 执行命令
-	_, err := executeCommand(Cmd, "--mode", "model")
+	_, err := ExecuteCommand(Cmd, "--mode", "model")
 	if err != nil {
 		t.Errorf("Failed to execute command with config: %v", err)
 	}
 	t.Log(gutils.ToJsonString(cfg))
-}
-
-// 测试命令基本功能
-func TestGenerateCommand(t *testing.T) {
-
-	t.Run("generate model code", func(t *testing.T) {
-		_, err := executeCommand(Cmd, "--mode", "model")
-		if err != nil {
-			t.Errorf("Failed to execute command with config: %v", err)
-		}
-	})
 }

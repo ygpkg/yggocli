@@ -1,144 +1,144 @@
 package ctr{{.PackageName}}
 
 import (
-	"{{.ProjectRootDir}}/internal/app/dto/dto{{.PackageName}}"
-	"{{.ProjectRootDir}}/internal/app/service/svc{{.PackageName}}"
+    "{{.AppPathInProject}}/dto/dto{{.PackageName}}"
+    "{{.AppPathInProject}}/service/svc{{.PackageName}}"
 
-	"github.com/gin-gonic/gin"
-	"github.com/morehao/golib/gcontext/ginRender"
+    "github.com/gin-gonic/gin"
+    "github.com/morehao/golib/gcontext/gincontext"
 )
 
-type {{.ReceiverTypePascalName}}Ctr interface {
-	Create(c *gin.Context)
-	Delete(c *gin.Context)
-	Update(c *gin.Context)
-	Detail(c *gin.Context)
-	PageList(c *gin.Context)
+type {{.StructName}}Ctr interface {
+	Create(ctx *gin.Context)
+	Delete(ctx *gin.Context)
+	Update(ctx *gin.Context)
+	Detail(ctx *gin.Context)
+	PageList(ctx *gin.Context)
 }
 
-type {{.ReceiverTypeName}}Ctr struct {
-	{{.ReceiverTypeName}}Svc svc{{.PackageName}}.{{.ReceiverTypePascalName}}Svc
+type {{.PackageName}}Ctr struct {
+	{{.PackageName}}Svc svc{{.PackageName}}.{{.StructName}}Svc
 }
 
-var _ {{.ReceiverTypePascalName}}Ctr = (*{{.ReceiverTypeName}}Ctr)(nil)
+var _ {{.StructName}}Ctr = (*{{.PackageName}}Ctr)(nil)
 
-func New{{.ReceiverTypePascalName}}Ctr() {{.ReceiverTypePascalName}}Ctr {
-	return &{{.ReceiverTypeName}}Ctr{
-		{{.ReceiverTypeName}}Svc: svc{{.PackageName}}.New{{.ReceiverTypePascalName}}Svc(),
+func New{{.StructName}}Ctr() {{.StructName}}Ctr {
+	return &{{.PackageName}}Ctr{
+		{{.PackageName}}Svc: svc{{.PackageName}}.New{{.StructName}}Svc(),
 	}
 }
 
 
 // Create 创建{{.Description}}
-// @Tags {{.ApiDocTag}}
+// @Tags {{.Description}}
 // @Summary 创建{{.Description}}
 // @accept application/json
 // @Produce application/json
 // @Param req body dto{{.PackageName}}.{{.StructName}}CreateReq true "创建{{.Description}}"
-// @Success 200 {object} dto.DefaultRender{data=dto{{.PackageName}}.{{.StructName}}CreateResp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router {{.ApiPrefix}}/create [post]
-func (ctr *{{.ReceiverTypeName}}Ctr) Create(c *gin.Context) {
+// @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}CreateResp} "{"code": 0,"data": "ok","msg": "success"}"
+// @Router /{{.AppName}}/{{.PackageName}}/create [post]
+func (ctr *{{.PackageName}}Ctr) Create(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}CreateReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		ginRender.Fail(c, err)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		gincontext.Fail(ctx, err)
 		return
 	}
-	res, err := ctr.{{.ReceiverTypeName}}Svc.Create(c, &req)
+	res, err := ctr.{{.PackageName}}Svc.Create(ctx, &req)
 	if err != nil {
-		ginRender.Fail(c, err)
+		gincontext.Fail(ctx, err)
 		return
 	} else {
-		ginRender.Success(c, res)
+		gincontext.Success(ctx, res)
 	}
 }
 
 // Delete 删除{{.Description}}
-// @Tags {{.ApiDocTag}}
+// @Tags {{.Description}}
 // @Summary 删除{{.Description}}
 // @accept application/json
 // @Produce application/json
 // @Param req body dto{{.PackageName}}.{{.StructName}}DeleteReq true "删除{{.Description}}"
-// @Success 200 {object} dto.DefaultRender{data=string} "{"code": 0,"data": "ok","msg": "删除成功"}"
-// @Router {{.ApiPrefix}}/delete [post]
-func (ctr *{{.ReceiverTypeName}}Ctr) Delete(c *gin.Context) {
+// @Success 200 {object} gincontext.DtoRender{data=string} "{"code": 0,"data": "ok","msg": "删除成功"}"
+// @Router /{{.AppName}}/{{.PackageName}}/delete [post]
+func (ctr *{{.PackageName}}Ctr) Delete(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}DeleteReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		ginRender.Fail(c, err)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		gincontext.Fail(ctx, err)
 		return
 	}
 
-	if err := ctr.{{.ReceiverTypeName}}Svc.Delete(c, &req); err != nil {
-		ginRender.Fail(c, err)
+	if err := ctr.{{.PackageName}}Svc.Delete(ctx, &req); err != nil {
+		gincontext.Fail(ctx, err)
 		return
 	} else {
-		ginRender.Success(c, "删除成功")
+		gincontext.Success(ctx, "删除成功")
 	}
 }
 
 // Update 修改{{.Description}}
-// @Tags {{.ApiDocTag}}
+// @Tags {{.Description}}
 // @Summary 修改{{.Description}}
 // @accept application/json
 // @Produce application/json
 // @Param req body dto{{.PackageName}}.{{.StructName}}UpdateReq true "修改{{.Description}}"
-// @Success 200 {object} dto.DefaultRender{data=string} "{"code": 0,"data": "ok","msg": "修改成功"}"
-// @Router {{.ApiPrefix}}/update [post]
-func (ctr *{{.ReceiverTypeName}}Ctr) Update(c *gin.Context) {
+// @Success 200 {object} gincontext.DtoRender{data=string} "{"code": 0,"data": "ok","msg": "修改成功"}"
+// @Router /{{.AppName}}/{{.PackageName}}/update [post]
+func (ctr *{{.PackageName}}Ctr) Update(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}UpdateReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		ginRender.Fail(c, err)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		gincontext.Fail(ctx, err)
 		return
 	}
-	if err := ctr.{{.ReceiverTypeName}}Svc.Update(c, &req); err != nil {
-		ginRender.Fail(c, err)
+	if err := ctr.{{.PackageName}}Svc.Update(ctx, &req); err != nil {
+		gincontext.Fail(ctx, err)
 		return
 	} else {
-		ginRender.Success(c, "修改成功")
+		gincontext.Success(ctx, "修改成功")
 	}
 }
 
 // Detail {{.Description}}详情
-// @Tags {{.ApiDocTag}}
+// @Tags {{.Description}}
 // @Summary {{.Description}}详情
 // @accept application/json
 // @Produce application/json
 // @Param req query dto{{.PackageName}}.{{.StructName}}DetailReq true "{{.Description}}详情"
-// @Success 200 {object} dto.DefaultRender{data=dto{{.PackageName}}.{{.StructName}}DetailResp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router {{.ApiPrefix}}/detail [get]
-func (ctr *{{.ReceiverTypeName}}Ctr) Detail(c *gin.Context) {
+// @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}DetailResp} "{"code": 0,"data": "ok","msg": "success"}"
+// @Router /{{.AppName}}/{{.PackageName}}/detail [get]
+func (ctr *{{.PackageName}}Ctr) Detail(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}DetailReq
-	if err := c.ShouldBindQuery(&req); err != nil {
-		ginRender.Fail(c, err)
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		gincontext.Fail(ctx, err)
 		return
 	}
-	res, err := ctr.{{.ReceiverTypeName}}Svc.Detail(c, &req)
+	res, err := ctr.{{.PackageName}}Svc.Detail(ctx, &req)
 	if err != nil {
-		ginRender.Fail(c, err)
+		gincontext.Fail(ctx, err)
 		return
 	} else {
-		ginRender.Success(c, res)
+		gincontext.Success(ctx, res)
 	}
 }
 
 // PageList {{.Description}}列表
-// @Tags {{.ApiDocTag}}
+// @Tags {{.Description}}
 // @Summary {{.Description}}列表分页
 // @accept application/json
 // @Produce application/json
 // @Param req query dto{{.PackageName}}.{{.StructName}}PageListReq true "{{.Description}}列表"
-// @Success 200 {object} dto.DefaultRender{data=dto{{.PackageName}}.{{.StructName}}PageListResp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router {{.ApiPrefix}}/pageList [get]
-func (ctr *{{.ReceiverTypeName}}Ctr) PageList(c *gin.Context) {
+// @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}PageListResp} "{"code": 0,"data": "ok","msg": "success"}"
+// @Router /{{.AppName}}/{{.PackageName}}/pageList [get]
+func (ctr *{{.PackageName}}Ctr) PageList(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}PageListReq
-	if err := c.ShouldBindQuery(&req); err != nil {
-		ginRender.Fail(c, err)
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		gincontext.Fail(ctx, err)
 		return
 	}
-	res, err := ctr.{{.ReceiverTypeName}}Svc.PageList(c, &req)
+	res, err := ctr.{{.PackageName}}Svc.PageList(ctx, &req)
 	if err != nil {
-		ginRender.Fail(c, err)
+		gincontext.Fail(ctx, err)
 		return
 	} else {
-		ginRender.Success(c, res)
+		gincontext.Success(ctx, res)
 	}
 }

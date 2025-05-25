@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 
 	"github.com/morehao/golib/codegen"
@@ -32,7 +31,10 @@ func genModule() error {
 			LayerNameMap:      cfg.LayerNameMap,
 			LayerPrefixMap:    cfg.LayerPrefixMap,
 			TplFuncMap: template.FuncMap{
-				TplFuncIsSysField: IsSysField,
+				TplFuncIsBuiltInField:      IsBuiltInField,
+				TplFuncIsSysField:          IsSysField,
+				TplFuncIsDefaultModelLayer: IsDefaultModelLayer,
+				TplFuncIsDefaultDaoLayer:   IsDefaultDaoLayer,
 			},
 		},
 		TableName: moduleGenCfg.TableName,
@@ -58,23 +60,34 @@ func genModule() error {
 			})
 		}
 
+		var modelLayerName, daoLayerName codegen.LayerName
+		for _, v := range analysisRes.TplAnalysisList {
+			if v.OriginLayerName == codegen.LayerNameModel {
+				modelLayerName = v.LayerName
+			}
+			if v.OriginLayerName == codegen.LayerNameDao {
+				daoLayerName = v.LayerName
+			}
+		}
+
 		genParamsList = append(genParamsList, codegen.GenParamsItem{
 			TargetDir:      v.TargetDir,
 			TargetFileName: v.TargetFilename,
 			Template:       v.Template,
 			ExtraParams: ModuleExtraParams{
-				PackageName:            analysisRes.PackageName,
-				ProjectRootDir:         workDir,
-				TableName:              analysisRes.TableName,
-				Description:            moduleGenCfg.Description,
-				StructName:             analysisRes.StructName,
-				ReceiverTypeName:       gutils.FirstLetterToLower(analysisRes.StructName),
-				ReceiverTypePascalName: analysisRes.StructName,
-				ApiDocTag:              moduleGenCfg.ApiDocTag,
-				ApiGroup:               moduleGenCfg.ApiGroup,
-				ApiPrefix:              strings.TrimSuffix(moduleGenCfg.ApiPrefix, "/"),
-				Template:               v.Template,
-				ModelFields:            modelFields,
+				AppInfo: AppInfo{
+					ProjectName:      cfg.appInfo.ProjectName,
+					AppPathInProject: cfg.appInfo.AppPathInProject,
+					AppName:          cfg.appInfo.AppName,
+				},
+				PackageName:    analysisRes.PackageName,
+				TableName:      analysisRes.TableName,
+				ModelLayerName: string(modelLayerName),
+				DaoLayerName:   string(daoLayerName),
+				Description:    moduleGenCfg.Description,
+				StructName:     analysisRes.StructName,
+				Template:       v.Template,
+				ModelFields:    modelFields,
 			},
 		})
 
@@ -96,18 +109,13 @@ func genModule() error {
 }
 
 type ModuleExtraParams struct {
-	ServiceName            string
-	ProjectRootDir         string
-	PackageName            string
-	PackagePascalName      string
-	TableName              string
-	Description            string
-	StructName             string
-	ReceiverTypeName       string
-	ReceiverTypePascalName string
-	ApiGroup               string
-	ApiPrefix              string
-	ApiDocTag              string
-	Template               *template.Template
-	ModelFields            []ModelField
+	AppInfo
+	PackageName    string
+	ModelLayerName string
+	DaoLayerName   string
+	TableName      string
+	Description    string
+	StructName     string
+	Template       *template.Template
+	ModelFields    []ModelField
 }

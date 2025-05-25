@@ -23,8 +23,8 @@ import (
 )
 
 type {{.StructName}}Cond struct {
-	ID             uint64
-	IDs            []uint64
+	ID             uint
+	IDs            []uint
 	IsDelete       bool
 	Page           int
 	PageSize       int
@@ -42,12 +42,12 @@ func New{{.StructName}}Dao() *{{.StructName}}Dao {
 }
 
 func (d *{{.StructName}}Dao) TableName() string {
-	return dao.TableNamedao{{.StructName}}
+	return {{.ModelLayerName}}.TableName{{.StructName}}
 }
 
 func (d *{{.StructName}}Dao) WithTx(db *gorm.DB) *{{.StructName}}Dao {
 	return &{{.StructName}}Dao{
-		Base: model.Base{Tx: db},
+		Base: {{.DaoLayerName}}.Base{Tx: db},
 	}
 }
 
@@ -71,15 +71,15 @@ func (d *{{.StructName}}Dao) BatchInsert(ctx *gin.Context, entityList {{.ModelLa
 	return nil
 }
 
-func (d *{{.StructName}}Dao) Update(ctx *gin.Context, entity *{{.ModelLayerName}}.{{.StructName}}Entity) error {
+func (d *{{.StructName}}Dao) UpdateByID(ctx *gin.Context, id uint, entity *{{.ModelLayerName}}.{{.StructName}}Entity) error {
 	db := dao.Db(ctx).Table(d.TableName())
-	if err := db.Where("id = ?", entity.ID).Updates(entity).Error; err != nil {
-		return code.GetError(code.DBUpdateErr).Wrapf(err, "[{{.StructName}}Dao] Update fail, entity:%s", gutils.ToJsonString(entity))
+	if err := db.Where("id = ?", id).Updates(entity).Error; err != nil {
+		return code.GetError(code.DBUpdateErr).Wrapf(err, "[{{.StructName}}Dao] UpdateByID fail, id:%d entity:%s", id, gutils.ToJsonString(entity))
 	}
 	return nil
 }
 
-func (d *{{.StructName}}Dao) UpdateMap(ctx *gin.Context, id uint64, updateMap map[string]interface{}) error {
+func (d *{{.StructName}}Dao) UpdateMap(ctx *gin.Context, id uint, updateMap map[string]interface{}) error {
 	db := dao.Db(ctx).Table(d.TableName())
 	if err := db.Where("id = ?", id).Updates(updateMap).Error; err != nil {
 		return code.GetError(code.DBUpdateErr).Wrapf(err, "[{{.StructName}}Dao] UpdateMap fail, id:%d, updateMap:%s", id, gutils.ToJsonString(updateMap))
@@ -87,7 +87,7 @@ func (d *{{.StructName}}Dao) UpdateMap(ctx *gin.Context, id uint64, updateMap ma
 	return nil
 }
 
-func (d *{{.StructName}}Dao) Delete(ctx *gin.Context, id, deletedBy uint64) error {
+func (d *{{.StructName}}Dao) Delete(ctx *gin.Context, id, deletedBy uint) error {
 	db := dao.Db(ctx).Table(d.TableName())
 	updatedField := map[string]interface{}{
 		"deleted_time": time.Now(),
@@ -99,8 +99,8 @@ func (d *{{.StructName}}Dao) Delete(ctx *gin.Context, id, deletedBy uint64) erro
 	return nil
 }
 
-func (d *{{.StructName}}Dao) GetById(ctx *gin.Context, id uint64) (*{{.ModelLayerName}}.{{.StructName}}Entity, error) {
-	var entity {{.StructName}}Entity
+func (d *{{.StructName}}Dao) GetById(ctx *gin.Context, id uint) (*{{.ModelLayerName}}.{{.StructName}}Entity, error) {
+	var entity {{.ModelLayerName}}.{{.StructName}}Entity
 	db := dao.Db(ctx).Table(d.TableName())
 	if err := db.Where("id = ?", id).Find(&entity).Error; err != nil {
 		return nil, code.GetError(code.DBFindErr).Wrapf(err, "[{{.StructName}}Dao] GetById fail, id:%d", id)
@@ -144,7 +144,7 @@ func (d *{{.StructName}}Dao) GetPageListByCond(ctx *gin.Context, cond *{{.Struct
 	if cond.PageSize > 0 && cond.Page > 0 {
 		db.Offset((cond.Page - 1) * cond.PageSize).Limit(cond.PageSize)
 	}
-	var list {{.StructName}}EntityList
+	var entityList {{.ModelLayerName}}.{{.StructName}}EntityList
 	if err := db.Find(&list).Error; err != nil {
 		return nil, 0, code.GetError(code.DBFindErr).Wrapf(err, "[{{.StructName}}Dao] GetPageListByCond find fail, cond:%s", gutils.ToJsonString(cond))
 	}
