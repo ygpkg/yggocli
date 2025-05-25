@@ -1,6 +1,5 @@
 [English](./README.md) | [简体中文](./README_cn.md)
 
-````markdown
 # gocli Introduction
 
 `gocli` is a command-line toolset written in Go, designed to boost development efficiency. It currently includes features for **code generation** and **quick project scaffolding**.
@@ -11,7 +10,7 @@
 
 ```bash
 go install github.com/morehao/gocli@latest
-````
+```
 
 ## generate
 
