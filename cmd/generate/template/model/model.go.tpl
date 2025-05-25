@@ -18,10 +18,10 @@ type {{.StructName}}Entity struct {
 
 type {{.StructName}}EntityList []{{.StructName}}Entity
 
-const TblName{{.StructName}} = "{{.TableName}}"
+const TableName{{.StructName}} = "{{.TableName}}"
 
 func ({{.StructName}}Entity ) TableName() string {
-  return TblName{{.StructName}}
+  return TableName{{.StructName}}
 }
 
 func (l {{.StructName}}EntityList) ToMap() map[uint]{{.StructName}}Entity {

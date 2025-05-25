@@ -52,7 +52,7 @@ func (d *{{.StructName}}Dao) WithTx(db *gorm.DB) *{{.StructName}}Dao {
 }
 
 func (d *{{.StructName}}Dao) Insert(ctx *gin.Context, entity *{{.ModelLayerName}}.{{.StructName}}Entity) error {
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 	if err := db.Create(entity).Error; err != nil {
 		return code.GetError(code.DBInsertErr).Wrapf(err, "[{{.StructName}}Dao] Insert fail, entity:%s", gutils.ToJsonString(entity))
 	}
@@ -64,7 +64,7 @@ func (d *{{.StructName}}Dao) BatchInsert(ctx *gin.Context, entityList {{.ModelLa
 		return code.GetError(code.DBInsertErr).Wrapf(nil, "[{{.StructName}}Dao] BatchInsert fail, entityList is empty")
 	}
 
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 	if err := db.Create(entityList).Error; err != nil {
 		return code.GetError(code.DBInsertErr).Wrapf(err, "[{{.StructName}}Dao] BatchInsert fail, entityList:%s", gutils.ToJsonString(entityList))
 	}
@@ -72,7 +72,7 @@ func (d *{{.StructName}}Dao) BatchInsert(ctx *gin.Context, entityList {{.ModelLa
 }
 
 func (d *{{.StructName}}Dao) UpdateByID(ctx *gin.Context, id uint, entity *{{.ModelLayerName}}.{{.StructName}}Entity) error {
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 	if err := db.Where("id = ?", id).Updates(entity).Error; err != nil {
 		return code.GetError(code.DBUpdateErr).Wrapf(err, "[{{.StructName}}Dao] UpdateByID fail, id:%d entity:%s", id, gutils.ToJsonString(entity))
 	}
@@ -80,7 +80,7 @@ func (d *{{.StructName}}Dao) UpdateByID(ctx *gin.Context, id uint, entity *{{.Mo
 }
 
 func (d *{{.StructName}}Dao) UpdateMap(ctx *gin.Context, id uint, updateMap map[string]interface{}) error {
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 	if err := db.Where("id = ?", id).Updates(updateMap).Error; err != nil {
 		return code.GetError(code.DBUpdateErr).Wrapf(err, "[{{.StructName}}Dao] UpdateMap fail, id:%d, updateMap:%s", id, gutils.ToJsonString(updateMap))
 	}
@@ -88,7 +88,7 @@ func (d *{{.StructName}}Dao) UpdateMap(ctx *gin.Context, id uint, updateMap map[
 }
 
 func (d *{{.StructName}}Dao) Delete(ctx *gin.Context, id, deletedBy uint) error {
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 	updatedField := map[string]interface{}{
 		"deleted_time": time.Now(),
 		"deleted_by":   deletedBy,
@@ -101,7 +101,7 @@ func (d *{{.StructName}}Dao) Delete(ctx *gin.Context, id, deletedBy uint) error 
 
 func (d *{{.StructName}}Dao) GetById(ctx *gin.Context, id uint) (*{{.ModelLayerName}}.{{.StructName}}Entity, error) {
 	var entity {{.ModelLayerName}}.{{.StructName}}Entity
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 	if err := db.Where("id = ?", id).Find(&entity).Error; err != nil {
 		return nil, code.GetError(code.DBFindErr).Wrapf(err, "[{{.StructName}}Dao] GetById fail, id:%d", id)
 	}
@@ -110,9 +110,9 @@ func (d *{{.StructName}}Dao) GetById(ctx *gin.Context, id uint) (*{{.ModelLayerN
 
 func (d *{{.StructName}}Dao) GetByCond(ctx *gin.Context, cond *{{.StructName}}Cond) (*{{.ModelLayerName}}.{{.StructName}}Entity, error) {
 	var entity {{.ModelLayerName}}.{{.StructName}}Entity
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 
-	dao.BuildCondition(db, cond)
+	d.BuildCondition(db, cond)
 
 	if err := db.Find(&entity).Error; err != nil {
 		return nil, code.GetError(code.DBFindErr).Wrapf(err, "[{{.StructName}}Dao] GetById fail, cond:%s", gutils.ToJsonString(cond))
@@ -122,9 +122,9 @@ func (d *{{.StructName}}Dao) GetByCond(ctx *gin.Context, cond *{{.StructName}}Co
 
 func (d *{{.StructName}}Dao) GetListByCond(ctx *gin.Context, cond *{{.StructName}}Cond) ({{.ModelLayerName}}.{{.StructName}}EntityList, error) {
 	var entityList {{.ModelLayerName}}.{{.StructName}}EntityList
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 
-	dao.BuildCondition(db, cond)
+	d.BuildCondition(db, cond)
 
 	if err := db.Find(&entityList).Error; err != nil {
 		return nil, code.GetError(code.DBFindErr).Wrapf(err, "[{{.StructName}}Dao] GetListByCond fail, cond:%s", gutils.ToJsonString(cond))
@@ -133,9 +133,9 @@ func (d *{{.StructName}}Dao) GetListByCond(ctx *gin.Context, cond *{{.StructName
 }
 
 func (d *{{.StructName}}Dao) GetPageListByCond(ctx *gin.Context, cond *{{.StructName}}Cond) ({{.ModelLayerName}}.{{.StructName}}EntityList, int64, error) {
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 
-	dao.BuildCondition(db, cond)
+	d.BuildCondition(db, cond)
 
 	var count int64
 	if err := db.Count(&count).Error; err != nil {
@@ -145,16 +145,16 @@ func (d *{{.StructName}}Dao) GetPageListByCond(ctx *gin.Context, cond *{{.Struct
 		db.Offset((cond.Page - 1) * cond.PageSize).Limit(cond.PageSize)
 	}
 	var entityList {{.ModelLayerName}}.{{.StructName}}EntityList
-	if err := db.Find(&list).Error; err != nil {
+	if err := db.Find(&entityList).Error; err != nil {
 		return nil, 0, code.GetError(code.DBFindErr).Wrapf(err, "[{{.StructName}}Dao] GetPageListByCond find fail, cond:%s", gutils.ToJsonString(cond))
 	}
-	return list, count, nil
+	return entityList, count, nil
 }
 
 func (d *{{.StructName}}Dao) CountByCond(ctx *gin.Context, cond *{{.StructName}}Cond) (int64, error) {
-	db := dao.Db(ctx).Table(d.TableName())
+	db := d.DB(ctx).Table(d.TableName())
 
-	dao.BuildCondition(db, cond)
+	d.BuildCondition(db, cond)
 	var count int64
 	if err := db.Count(&count).Error; err != nil {
 		return 0, code.GetError(code.DBFindErr).Wrapf(err, "[{{.StructName}}Dao] CountByCond fail, cond:%s", gutils.ToJsonString(cond))
@@ -164,19 +164,19 @@ func (d *{{.StructName}}Dao) CountByCond(ctx *gin.Context, cond *{{.StructName}}
 
 func (d *{{.StructName}}Dao) BuildCondition(db *gorm.DB, cond *{{.StructName}}Cond) {
 	if cond.ID > 0 {
-		query := fmt.Sprintf("%s.id = ?", dao.TableName())
+		query := fmt.Sprintf("%s.id = ?", d.TableName())
 		db.Where(query, cond.ID)
 	}
 	if len(cond.IDs) > 0 {
-		query := fmt.Sprintf("%s.id in (?)", dao.TableName())
+		query := fmt.Sprintf("%s.id in (?)", d.TableName())
 		db.Where(query, cond.IDs)
 	}
 	if cond.CreatedAtStart > 0 {
-		query := fmt.Sprintf("%s.created_at >= ?", dao.TableName())
+		query := fmt.Sprintf("%s.created_at >= ?", d.TableName())
 		db.Where(query, time.Unix(cond.CreatedAtStart, 0))
 	}
 	if cond.CreatedAtEnd > 0 {
-		query := fmt.Sprintf("%s.created_at <= ?", dao.TableName())
+		query := fmt.Sprintf("%s.created_at <= ?", d.TableName())
 		db.Where(query, time.Unix(cond.CreatedAtEnd, 0))
 	}
 	if cond.IsDelete {

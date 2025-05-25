@@ -55,6 +55,8 @@ github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjY
 github.com/morehao/golib v1.2.9/go.mod h1:P74NktaSlyfMt72brUPCc84Fp2c2E0Q0I5ITk4jyNVc=
 github.com/morehao/golib v1.2.10 h1:8rG0hVXrSgz3myHzl3dYyYtGpCNHwGmMB3N62cR63yo=
 github.com/morehao/golib v1.2.10/go.mod h1:P74NktaSlyfMt72brUPCc84Fp2c2E0Q0I5ITk4jyNVc=
+github.com/morehao/golib v1.2.11 h1:qrxJs/kevLjqOw4nYUfVoDfvGogC15+u7R+p/y6TZ1g=
+github.com/morehao/golib v1.2.11/go.mod h1:P74NktaSlyfMt72brUPCc84Fp2c2E0Q0I5ITk4jyNVc=
 github.com/pelletier/go-toml/v2 v2.2.2 h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=
 github.com/pelletier/go-toml/v2 v2.2.2/go.mod h1:1t835xjRzz80PqgE6HHgN2JOsmgYu/h4qDAS4n929Rs=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

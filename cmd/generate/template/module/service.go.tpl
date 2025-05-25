@@ -42,7 +42,7 @@ func New{{.StructName}}Svc() {{.StructName}}Svc {
 // Create 创建{{.Description}}
 func (svc *{{.StructNameLowerCamel}}Svc) Create(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}CreateReq) (*dto{{.PackageName}}.{{.StructName}}CreateResp, error) {
 	userID := gincontext.GetUserID(ctx)
-	insertEntity := &dao{{.PackageName}}.{{.StructName}}Entity{
+	insertEntity := &{{.ModelLayerName}}.{{.StructName}}Entity{
 {{- range .ModelFields}}
 	{{- if isSysField .FieldName}}
 		{{- continue}}
@@ -59,7 +59,7 @@ func (svc *{{.StructNameLowerCamel}}Svc) Create(ctx *gin.Context, req *dto{{.Pac
 
 	if err := dao{{.PackageName}}.New{{.StructName}}Dao().Insert(ctx, insertEntity); err != nil {
 		glog.Errorf(ctx, "[svc{{.PackageName}}.{{.StructName}}Create] dao{{.StructName}} Create fail, err:%v, req:%s", err, gutils.ToJsonString(req))
-		return nil, code.GetError(code.{{.StructName}}CreateErr)
+		return nil, code.GetError(code.{{.StructName}}CreateError)
 	}
 	return &dto{{.PackageName}}.{{.StructName}}CreateResp{
 		ID: insertEntity.ID,
@@ -72,7 +72,7 @@ func (svc *{{.StructNameLowerCamel}}Svc) Delete(ctx *gin.Context, req *dto{{.Pac
 
 	if err := dao{{.PackageName}}.New{{.StructName}}Dao().Delete(ctx, req.ID, userID); err != nil {
 		glog.Errorf(ctx, "[svc{{.PackageName}}.Delete] dao{{.StructName}} Delete fail, err:%v, req:%s", err, gutils.ToJsonString(req))
-		return code.GetError(code.{{.StructName}}DeleteErr)
+		return code.GetError(code.{{.StructName}}DeleteError)
 	}
 	return nil
 }
@@ -81,7 +81,7 @@ func (svc *{{.StructNameLowerCamel}}Svc) Delete(ctx *gin.Context, req *dto{{.Pac
 func (svc *{{.StructNameLowerCamel}}Svc) Update(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}UpdateReq) error {
     userID := gincontext.GetUserID(ctx)
 
-	updateEntity := &dao{{.PackageName}}.{{.StructName}}Entity{
+	updateEntity := &{{.ModelLayerName}}.{{.StructName}}Entity{
     {{- range .ModelFields}}
     {{- if isSysField .FieldName}}
         {{- continue}}
@@ -94,9 +94,9 @@ func (svc *{{.StructNameLowerCamel}}Svc) Update(ctx *gin.Context, req *dto{{.Pac
     {{- end}}
         UpdatedBy:    userID,
     }
-    if err := dao{{.PackageName}}.New{{.StructName}}Dao().UpdateById(ctx, req.ID, updateEntity); err != nil {
-        glog.Errorf(ctx, "[svc{{.PackageName}}.{{.StructName}}Update] dao{{.StructName}} UpdateById fail, err:%v, req:%s", err, gutils.ToJsonString(req))
-        return code.GetError(code.{{.StructName}}UpdateErr)
+    if err := dao{{.PackageName}}.New{{.StructName}}Dao().UpdateByID(ctx, req.ID, updateEntity); err != nil {
+        glog.Errorf(ctx, "[svc{{.PackageName}}.{{.StructName}}Update] dao{{.StructName}} UpdateByID fail, err:%v, req:%s", err, gutils.ToJsonString(req))
+        return code.GetError(code.{{.StructName}}UpdateError)
     }
     return nil
 }
@@ -106,11 +106,11 @@ func (svc *{{.StructNameLowerCamel}}Svc) Detail(ctx *gin.Context, req *dto{{.Pac
 	detailEntity, err := dao{{.PackageName}}.New{{.StructName}}Dao().GetById(ctx, req.ID)
 	if err != nil {
 		glog.Errorf(ctx, "[svc{{.PackageName}}.{{.StructName}}Detail] dao{{.StructName}} GetById fail, err:%v, req:%s", err, gutils.ToJsonString(req))
-		return nil, code.GetError(code.{{.StructName}}GetDetailErr)
+		return nil, code.GetError(code.{{.StructName}}GetDetailError)
 	}
     // 判断是否存在
     if detailEntity == nil || detailEntity.ID == 0 {
-        return nil, code.GetError(code.{{.StructName}}NotExistErr)
+        return nil, code.GetError(code.{{.StructName}}NotExistError)
     }
 	resp := &dto{{.PackageName}}.{{.StructName}}DetailResp{
 		ID:   detailEntity.ID,
@@ -145,7 +145,7 @@ func (svc *{{.StructNameLowerCamel}}Svc) PageList(ctx *gin.Context, req *dto{{.P
 	dataList, total, err := dao{{.PackageName}}.New{{.StructName}}Dao().GetPageListByCond(ctx, cond)
 	if err != nil {
 		glog.Errorf(ctx, "[svc{{.PackageName}}.{{.StructName}}PageList] dao{{.StructName}} GetPageListByCond fail, err:%v, req:%s", err, gutils.ToJsonString(req))
-		return nil, code.GetError(code.{{.StructName}}GetPageListErr)
+		return nil, code.GetError(code.{{.StructName}}GetPageListError)
 	}
 	list := make([]dto{{.PackageName}}.{{.StructName}}PageListItem, 0, len(dataList))
 	for _, v := range dataList {
