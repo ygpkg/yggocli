@@ -39,6 +39,10 @@ cmd/generate/_example/internal/apps/demoapp/*
 !cmd/generate/_example/internal/apps/demoapp/router/
 !cmd/generate/_example/internal/apps/demoapp/router/enter.go
 
+# 不忽略 code/enter.go（注意先保 code 再保文件）
+!cmd/generate/_example/internal/apps/demoapp/code/
+!cmd/generate/_example/internal/apps/demoapp/code/enter.go
+
 # 不忽略 generate_test.go
 !cmd/generate/_example/internal/apps/demoapp/generate_test.go
 

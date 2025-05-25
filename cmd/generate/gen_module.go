@@ -15,9 +15,9 @@ func genModule() error {
 	moduleGenCfg := cfg.Module
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
-	tplDir, err := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/module")
-	if err != nil {
-		return err
+	tplDir, getTplErr := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/module")
+	if getTplErr != nil {
+		return getTplErr
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
@@ -45,6 +45,16 @@ func genModule() error {
 		return fmt.Errorf("analysis module tpl error: %v", analysisErr)
 	}
 
+	var modelLayerName, daoLayerName codegen.LayerName
+	for _, v := range analysisRes.TplAnalysisList {
+		if v.OriginLayerName == codegen.LayerNameModel {
+			modelLayerName = v.LayerName
+		}
+		if v.OriginLayerName == codegen.LayerNameDao {
+			daoLayerName = v.LayerName
+		}
+	}
+
 	var genParamsList []codegen.GenParamsItem
 	for _, v := range analysisRes.TplAnalysisList {
 		var modelFields []ModelField
@@ -58,16 +68,6 @@ func genModule() error {
 				Comment:            field.Comment,
 				IsPrimaryKey:       field.ColumnKey == codegen.ColumnKeyPRI,
 			})
-		}
-
-		var modelLayerName, daoLayerName codegen.LayerName
-		for _, v := range analysisRes.TplAnalysisList {
-			if v.OriginLayerName == codegen.LayerNameModel {
-				modelLayerName = v.LayerName
-			}
-			if v.OriginLayerName == codegen.LayerNameDao {
-				daoLayerName = v.LayerName
-			}
 		}
 
 		genParamsList = append(genParamsList, codegen.GenParamsItem{
@@ -100,10 +100,17 @@ func genModule() error {
 	}
 
 	// 注册路由
-	routerCallContent := fmt.Sprintf("%sRouter(routerGroup)", gutils.FirstLetterToLower(analysisRes.StructName))
+	routerContent := fmt.Sprintf("%sRouter(routerGroup)", analysisRes.PackageName)
 	routerEnterFilepath := filepath.Join(workDir, "/router/enter.go")
-	if err := gast.AddContentToFunc(routerEnterFilepath, "RegisterRouter", routerCallContent); err != nil {
-		return fmt.Errorf("appendContentToFunc error: %v", err)
+	if err := gast.AddContentToFunc(routerEnterFilepath, "RegisterRouter", routerContent); err != nil {
+		return fmt.Errorf("router appendContentToFunc error: %v", err)
+	}
+
+	// 注册错误码
+	codeContent := fmt.Sprintf("registerError(%sErrorMsgMap)", analysisRes.PackageName)
+	codeEnterFilepath := filepath.Join(workDir, "/code/enter.go")
+	if err := gast.AddContentToFunc(codeEnterFilepath, "init", codeContent); err != nil {
+		return fmt.Errorf("code appendContentToFunc error: %v", err)
 	}
 	return nil
 }
