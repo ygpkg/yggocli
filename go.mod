@@ -3,14 +3,12 @@ module github.com/morehao/gocli
 go 1.23.3
 
 require (
-	github.com/morehao/golib v1.2.9
+	github.com/morehao/golib v1.2.10
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
 	gorm.io/driver/mysql v1.5.7
-	gorm.io/gorm v1.25.12
+	gorm.io/gorm v1.26.1
 )
-
-replace github.com/morehao/golib => /Users/morehao/Documents/practice/go/golib
 
 require (
 	github.com/bytedance/sonic v1.13.2 // indirect
