@@ -19,4 +19,10 @@ func TestGenerateCommand(t *testing.T) {
 			t.Errorf("Failed to execute command with config: %v", err)
 		}
 	})
+	t.Run("generate api code", func(t *testing.T) {
+		_, err := generate.ExecuteCommand(generate.Cmd, "--mode", "api")
+		if err != nil {
+			t.Errorf("Failed to execute command with config: %v", err)
+		}
+	})
 }

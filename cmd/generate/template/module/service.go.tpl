@@ -7,7 +7,7 @@ import (
     {{- else}}
     "{{.AppPathInProject}}/dao/{{.DaoLayerName}}/dao{{.PackageName}}"
     {{- end}}
-	"{{.AppPathInProject}}/dto/dtouser"
+	"{{.AppPathInProject}}/dto/dto{{.PackageName}}"
     {{- if isDefaultModelLayer .ModelLayerName}}
     "{{.AppPathInProject}}/model"
     {{- else}}

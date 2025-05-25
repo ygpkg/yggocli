@@ -14,16 +14,10 @@ model:
   description: 用户
   table_name: user
 api:
-  internal_app_root_dir: internal/demo
-  project_root_dir: demo
-  description: 禁用公司账户
-  package_name: companyAccount
-  sub_module_name: companyAccount
-  target_filename: company_account.go
+  package_name: user
+  target_filename: user_login_log.go
+  function_name: Delete
   http_method: POST
-  function_name: Disable
-  api_doc_tag: 公司账户管理
-  api_group:  companyAccount
-  api_prefix: /demo/companyAccount/
-  api_suffix: disable
+  description: 删除登录记录
+  api_doc_tag: 用户登录记录
 
