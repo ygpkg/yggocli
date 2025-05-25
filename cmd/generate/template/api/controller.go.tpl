@@ -1,11 +1,11 @@
-package ctr{{.PackagePascalName}}
+package ctr{{.PackageName}}
 
 import (
-	"{{.ProjectRootDir}}/internal/app/dto/dto{{.PackagePascalName}}"
-	"{{.ProjectRootDir}}/internal/app/service/svc{{.PackagePascalName}}"
+    "{{.AppPathInProject}}/dto/dto{{.PackageName}}"
+    "{{.AppPathInProject}}/service/svc{{.PackageName}}"
 
-	"github.com/gin-gonic/gin"
-	"github.com/morehao/golib/gcontext/ginRender"
+    "github.com/gin-gonic/gin"
+    "github.com/morehao/golib/gcontext/gincontext"
 )
 {{if not .TargetFileExist}}
 type {{.ReceiverTypePascalName}}Ctr interface {
@@ -13,14 +13,14 @@ type {{.ReceiverTypePascalName}}Ctr interface {
 }
 
 type {{.ReceiverTypeName}}Ctr struct {
-	{{.ReceiverTypeName}}Svc svc{{.PackagePascalName}}.{{.ReceiverTypePascalName}}Svc
+	{{.ReceiverTypeName}}Svc svc{{.PackageName}}.{{.ReceiverTypePascalName}}Svc
 }
 
 var _ {{.ReceiverTypePascalName}}Ctr = (*{{.ReceiverTypeName}}Ctr)(nil)
 
 func New{{.ReceiverTypePascalName}}Ctr() {{.ReceiverTypePascalName}}Ctr {
 	return &{{.ReceiverTypeName}}Ctr{
-		{{.ReceiverTypeName}}Svc: svc{{.PackagePascalName}}.New{{.ReceiverTypePascalName}}Svc(),
+		{{.ReceiverTypeName}}Svc: svc{{.PackageName}}.New{{.ReceiverTypePascalName}}Svc(),
 	}
 }
 {{end}}
@@ -30,11 +30,11 @@ func New{{.ReceiverTypePascalName}}Ctr() {{.ReceiverTypePascalName}}Ctr {
 // @Summary {{.Description}}
 // @accept application/json
 // @Produce application/json
-// @Param req body dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req true "{{.Description}}"
-// @Success 200 {object} dto.DefaultRender{data=dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
+// @Param req body dto{{.PackageName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req true "{{.Description}}"
+// @Success 200 {object} dto.DefaultRender{data=dto{{.PackageName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
 // @Router {{.ApiPrefix}}/{{.ApiSuffix}} [post]
 func (ctr *{{.ReceiverTypeName}}Ctr) {{.FunctionName}}(c *gin.Context) {
-	var req dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req
+	var req dto{{.PackageName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req
 	if err := c.ShouldBindJSON(&req); err != nil {
 		ginRender.Fail(c, err)
 		return
@@ -53,11 +53,11 @@ func (ctr *{{.ReceiverTypeName}}Ctr) {{.FunctionName}}(c *gin.Context) {
 // @Summary {{.Description}}
 // @accept application/json
 // @Produce application/json
-// @Param req query dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req true "{{.Description}}"
-// @Success 200 {object} dto.DefaultRender{data=dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
+// @Param req query dto{{.PackageName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req true "{{.Description}}"
+// @Success 200 {object} dto.DefaultRender{data=dto{{.PackageName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
 // @Router {{.ApiPrefix}}/{{.ApiSuffix}} [get]
 func (ctr *{{.ReceiverTypeName}}Ctr){{.FunctionName}}(c *gin.Context) {
-	var req dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req
+	var req dto{{.PackageName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req
 	if err := c.ShouldBindQuery(&req); err != nil {
 		ginRender.Fail(c, err)
 		return

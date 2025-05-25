@@ -30,17 +30,17 @@ type {{.StructName}}Svc interface {
 	PageList(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}PageListReq) (*dto{{.PackageName}}.{{.StructName}}PageListResp, error)
 }
 
-type {{.PackageName}}Svc struct {
+type {{.StructNameLowerCamel}}Svc struct {
 }
 
-var _ {{.StructName}}Svc = (*{{.PackageName}}Svc)(nil)
+var _ {{.StructName}}Svc = (*{{.StructNameLowerCamel}}Svc)(nil)
 
 func New{{.StructName}}Svc() {{.StructName}}Svc {
-	return &{{.PackageName}}Svc{}
+	return &{{.StructNameLowerCamel}}Svc{}
 }
 
 // Create 创建{{.Description}}
-func (svc *{{.PackageName}}Svc) Create(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}CreateReq) (*dto{{.PackageName}}.{{.StructName}}CreateResp, error) {
+func (svc *{{.StructNameLowerCamel}}Svc) Create(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}CreateReq) (*dto{{.PackageName}}.{{.StructName}}CreateResp, error) {
 	userID := gincontext.GetUserID(ctx)
 	insertEntity := &dao{{.PackageName}}.{{.StructName}}Entity{
 {{- range .ModelFields}}
@@ -67,7 +67,7 @@ func (svc *{{.PackageName}}Svc) Create(ctx *gin.Context, req *dto{{.PackageName}
 }
 
 // Delete 删除{{.Description}}
-func (svc *{{.PackageName}}Svc) Delete(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}DeleteReq) error {
+func (svc *{{.StructNameLowerCamel}}Svc) Delete(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}DeleteReq) error {
 	userID := gincontext.GetUserID(ctx)
 
 	if err := dao{{.PackageName}}.New{{.StructName}}Dao().Delete(ctx, req.ID, userID); err != nil {
@@ -78,7 +78,7 @@ func (svc *{{.PackageName}}Svc) Delete(ctx *gin.Context, req *dto{{.PackageName}
 }
 
 // Update 更新{{.Description}}
-func (svc *{{.PackageName}}Svc) Update(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}UpdateReq) error {
+func (svc *{{.StructNameLowerCamel}}Svc) Update(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}UpdateReq) error {
     userID := gincontext.GetUserID(ctx)
 
 	updateEntity := &dao{{.PackageName}}.{{.StructName}}Entity{
@@ -102,7 +102,7 @@ func (svc *{{.PackageName}}Svc) Update(ctx *gin.Context, req *dto{{.PackageName}
 }
 
 // Detail 根据id获取{{.Description}}
-func (svc *{{.PackageName}}Svc) Detail(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}DetailReq) (*dto{{.PackageName}}.{{.StructName}}DetailResp, error) {
+func (svc *{{.StructNameLowerCamel}}Svc) Detail(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}DetailReq) (*dto{{.PackageName}}.{{.StructName}}DetailResp, error) {
 	detailEntity, err := dao{{.PackageName}}.New{{.StructName}}Dao().GetById(ctx, req.ID)
 	if err != nil {
 		glog.Errorf(ctx, "[svc{{.PackageName}}.{{.StructName}}Detail] dao{{.StructName}} GetById fail, err:%v, req:%s", err, gutils.ToJsonString(req))
@@ -137,7 +137,7 @@ func (svc *{{.PackageName}}Svc) Detail(ctx *gin.Context, req *dto{{.PackageName}
 }
 
 // PageList 分页获取{{.Description}}列表
-func (svc *{{.PackageName}}Svc) PageList(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}PageListReq) (*dto{{.PackageName}}.{{.StructName}}PageListResp, error) {
+func (svc *{{.StructNameLowerCamel}}Svc) PageList(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}PageListReq) (*dto{{.PackageName}}.{{.StructName}}PageListResp, error) {
 	cond := &dao{{.PackageName}}.{{.StructName}}Cond{
 		Page:     req.Page,
 		PageSize: req.PageSize,

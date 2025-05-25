@@ -1,4 +1,4 @@
-mysql_dsn: root:123456@tcp(127.0.0.1:3306)/practice?charset=utf8mb4&parseTime=True&loc=Local
+mysql_dsn: root:123456@tcp(127.0.0.1:3306)/demo?charset=utf8mb4&parseTime=True&loc=Local
 #layer_parent_dir_map:
 #  model: model
 #  dao: dao
@@ -7,9 +7,8 @@ mysql_dsn: root:123456@tcp(127.0.0.1:3306)/practice?charset=utf8mb4&parseTime=Tr
 #  dao: mysqldao
 module:
   package_name: user
-  description: 用户
-  table_name: user
-  api_doc_tag: 用户管理
+  description: 用户登录记录
+  table_name: user_login_log
 model:
   package_name: user
   description: 用户

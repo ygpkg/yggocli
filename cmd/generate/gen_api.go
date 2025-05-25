@@ -16,9 +16,9 @@ func genApi() error {
 	apiGenCfg := cfg.Api
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
-	tplDir, err := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/api")
-	if err != nil {
-		return err
+	tplDir, getTplErr := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/api")
+	if getTplErr != nil {
+		return getTplErr
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
@@ -70,8 +70,12 @@ func genApi() error {
 			TargetFileName: v.TargetFilename,
 			Template:       v.Template,
 			ExtraParams: ApiExtraParams{
+				AppInfo: AppInfo{
+					ProjectName:      cfg.appInfo.ProjectName,
+					AppPathInProject: cfg.appInfo.AppPathInProject,
+					AppName:          cfg.appInfo.AppName,
+				},
 				PackageName:            analysisRes.PackageName,
-				ProjectRootDir:         apiGenCfg.ProjectRootDir,
 				TargetFileExist:        v.TargetFileExist,
 				IsNewRouter:            isNewRouter,
 				Description:            apiGenCfg.Description,
@@ -125,10 +129,8 @@ func genApi() error {
 }
 
 type ApiExtraParams struct {
-	ServiceName            string
-	ProjectRootDir         string
+	AppInfo
 	PackageName            string
-	PackagePascalName      string
 	Description            string
 	TargetFileExist        bool
 	IsNewRouter            bool

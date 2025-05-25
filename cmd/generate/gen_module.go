@@ -80,14 +80,15 @@ func genModule() error {
 					AppPathInProject: cfg.appInfo.AppPathInProject,
 					AppName:          cfg.appInfo.AppName,
 				},
-				PackageName:    analysisRes.PackageName,
-				TableName:      analysisRes.TableName,
-				ModelLayerName: string(modelLayerName),
-				DaoLayerName:   string(daoLayerName),
-				Description:    moduleGenCfg.Description,
-				StructName:     analysisRes.StructName,
-				Template:       v.Template,
-				ModelFields:    modelFields,
+				PackageName:          analysisRes.PackageName,
+				TableName:            analysisRes.TableName,
+				ModelLayerName:       string(modelLayerName),
+				DaoLayerName:         string(daoLayerName),
+				Description:          moduleGenCfg.Description,
+				StructName:           analysisRes.StructName,
+				StructNameLowerCamel: gutils.FirstLetterToLower(analysisRes.StructName),
+				Template:             v.Template,
+				ModelFields:          modelFields,
 			},
 		})
 
@@ -100,14 +101,14 @@ func genModule() error {
 	}
 
 	// 注册路由
-	routerContent := fmt.Sprintf("%sRouter(routerGroup)", analysisRes.PackageName)
+	routerContent := fmt.Sprintf("%sRouter(routerGroup)", gutils.FirstLetterToLower(analysisRes.StructName))
 	routerEnterFilepath := filepath.Join(workDir, "/router/enter.go")
 	if err := gast.AddContentToFunc(routerEnterFilepath, "RegisterRouter", routerContent); err != nil {
 		return fmt.Errorf("router appendContentToFunc error: %v", err)
 	}
 
 	// 注册错误码
-	codeContent := fmt.Sprintf("registerError(%sErrorMsgMap)", analysisRes.PackageName)
+	codeContent := fmt.Sprintf("registerError(%sErrorMsgMap)", gutils.FirstLetterToLower(analysisRes.StructName))
 	codeEnterFilepath := filepath.Join(workDir, "/code/enter.go")
 	if err := gast.AddContentToFunc(codeEnterFilepath, "init", codeContent); err != nil {
 		return fmt.Errorf("code appendContentToFunc error: %v", err)
@@ -117,12 +118,13 @@ func genModule() error {
 
 type ModuleExtraParams struct {
 	AppInfo
-	PackageName    string
-	ModelLayerName string
-	DaoLayerName   string
-	TableName      string
-	Description    string
-	StructName     string
-	Template       *template.Template
-	ModelFields    []ModelField
+	PackageName          string
+	ModelLayerName       string
+	DaoLayerName         string
+	TableName            string
+	Description          string
+	StructName           string
+	StructNameLowerCamel string // 结构体小写驼峰名
+	Template             *template.Template
+	ModelFields          []ModelField
 }

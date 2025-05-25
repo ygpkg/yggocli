@@ -33,9 +33,6 @@ type ModuleConfig struct {
 	PackageName string `yaml:"package_name"` // 包名
 	Description string `yaml:"description"`  // 描述
 	TableName   string `yaml:"table_name"`   // 表名
-	ApiDocTag   string `yaml:"api_doc_tag"`  // api文档tag
-	ApiGroup    string `yaml:"api_group"`    // api分组
-	ApiPrefix   string `yaml:"api_prefix"`   // api前缀
 }
 
 type ModelConfig struct {

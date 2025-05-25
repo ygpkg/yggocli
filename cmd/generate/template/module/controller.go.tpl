@@ -16,15 +16,15 @@ type {{.StructName}}Ctr interface {
 	PageList(ctx *gin.Context)
 }
 
-type {{.PackageName}}Ctr struct {
-	{{.PackageName}}Svc svc{{.PackageName}}.{{.StructName}}Svc
+type {{.StructNameLowerCamel}}Ctr struct {
+	{{.StructNameLowerCamel}}Svc svc{{.PackageName}}.{{.StructName}}Svc
 }
 
-var _ {{.StructName}}Ctr = (*{{.PackageName}}Ctr)(nil)
+var _ {{.StructName}}Ctr = (*{{.StructNameLowerCamel}}Ctr)(nil)
 
 func New{{.StructName}}Ctr() {{.StructName}}Ctr {
-	return &{{.PackageName}}Ctr{
-		{{.PackageName}}Svc: svc{{.PackageName}}.New{{.StructName}}Svc(),
+	return &{{.StructNameLowerCamel}}Ctr{
+		{{.StructNameLowerCamel}}Svc: svc{{.PackageName}}.New{{.StructName}}Svc(),
 	}
 }
 
@@ -36,14 +36,14 @@ func New{{.StructName}}Ctr() {{.StructName}}Ctr {
 // @Produce application/json
 // @Param req body dto{{.PackageName}}.{{.StructName}}CreateReq true "创建{{.Description}}"
 // @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}CreateResp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router /{{.AppName}}/{{.PackageName}}/create [post]
-func (ctr *{{.PackageName}}Ctr) Create(ctx *gin.Context) {
+// @Router /{{.AppName}}/{{.StructNameLowerCamel}}/create [post]
+func (ctr *{{.StructNameLowerCamel}}Ctr) Create(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}CreateReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		gincontext.Fail(ctx, err)
 		return
 	}
-	res, err := ctr.{{.PackageName}}Svc.Create(ctx, &req)
+	res, err := ctr.{{.StructNameLowerCamel}}Svc.Create(ctx, &req)
 	if err != nil {
 		gincontext.Fail(ctx, err)
 		return
@@ -59,15 +59,15 @@ func (ctr *{{.PackageName}}Ctr) Create(ctx *gin.Context) {
 // @Produce application/json
 // @Param req body dto{{.PackageName}}.{{.StructName}}DeleteReq true "删除{{.Description}}"
 // @Success 200 {object} gincontext.DtoRender{data=string} "{"code": 0,"data": "ok","msg": "删除成功"}"
-// @Router /{{.AppName}}/{{.PackageName}}/delete [post]
-func (ctr *{{.PackageName}}Ctr) Delete(ctx *gin.Context) {
+// @Router /{{.AppName}}/{{.StructNameLowerCamel}}/delete [post]
+func (ctr *{{.StructNameLowerCamel}}Ctr) Delete(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}DeleteReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		gincontext.Fail(ctx, err)
 		return
 	}
 
-	if err := ctr.{{.PackageName}}Svc.Delete(ctx, &req); err != nil {
+	if err := ctr.{{.StructNameLowerCamel}}Svc.Delete(ctx, &req); err != nil {
 		gincontext.Fail(ctx, err)
 		return
 	} else {
@@ -82,14 +82,14 @@ func (ctr *{{.PackageName}}Ctr) Delete(ctx *gin.Context) {
 // @Produce application/json
 // @Param req body dto{{.PackageName}}.{{.StructName}}UpdateReq true "修改{{.Description}}"
 // @Success 200 {object} gincontext.DtoRender{data=string} "{"code": 0,"data": "ok","msg": "修改成功"}"
-// @Router /{{.AppName}}/{{.PackageName}}/update [post]
-func (ctr *{{.PackageName}}Ctr) Update(ctx *gin.Context) {
+// @Router /{{.AppName}}/{{.StructNameLowerCamel}}/update [post]
+func (ctr *{{.StructNameLowerCamel}}Ctr) Update(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}UpdateReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		gincontext.Fail(ctx, err)
 		return
 	}
-	if err := ctr.{{.PackageName}}Svc.Update(ctx, &req); err != nil {
+	if err := ctr.{{.StructNameLowerCamel}}Svc.Update(ctx, &req); err != nil {
 		gincontext.Fail(ctx, err)
 		return
 	} else {
@@ -104,14 +104,14 @@ func (ctr *{{.PackageName}}Ctr) Update(ctx *gin.Context) {
 // @Produce application/json
 // @Param req query dto{{.PackageName}}.{{.StructName}}DetailReq true "{{.Description}}详情"
 // @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}DetailResp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router /{{.AppName}}/{{.PackageName}}/detail [get]
-func (ctr *{{.PackageName}}Ctr) Detail(ctx *gin.Context) {
+// @Router /{{.AppName}}/{{.StructNameLowerCamel}}/detail [get]
+func (ctr *{{.StructNameLowerCamel}}Ctr) Detail(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}DetailReq
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		gincontext.Fail(ctx, err)
 		return
 	}
-	res, err := ctr.{{.PackageName}}Svc.Detail(ctx, &req)
+	res, err := ctr.{{.StructNameLowerCamel}}Svc.Detail(ctx, &req)
 	if err != nil {
 		gincontext.Fail(ctx, err)
 		return
@@ -127,14 +127,14 @@ func (ctr *{{.PackageName}}Ctr) Detail(ctx *gin.Context) {
 // @Produce application/json
 // @Param req query dto{{.PackageName}}.{{.StructName}}PageListReq true "{{.Description}}列表"
 // @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}PageListResp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router /{{.AppName}}/{{.PackageName}}/pageList [get]
-func (ctr *{{.PackageName}}Ctr) PageList(ctx *gin.Context) {
+// @Router /{{.AppName}}/{{.StructNameLowerCamel}}/pageList [get]
+func (ctr *{{.StructNameLowerCamel}}Ctr) PageList(ctx *gin.Context) {
 	var req dto{{.PackageName}}.{{.StructName}}PageListReq
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		gincontext.Fail(ctx, err)
 		return
 	}
-	res, err := ctr.{{.PackageName}}Svc.PageList(ctx, &req)
+	res, err := ctr.{{.StructNameLowerCamel}}Svc.PageList(ctx, &req)
 	if err != nil {
 		gincontext.Fail(ctx, err)
 		return

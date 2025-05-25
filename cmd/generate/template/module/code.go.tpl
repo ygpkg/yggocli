@@ -11,7 +11,7 @@ const (
     {{.StructName}}NotExistError    = 100105
 )
 
-var {{.PackageName}}ErrorMsgMap = gerror.CodeMsgMap{
+var {{.StructNameLowerCamel}}ErrorMsgMap = gerror.CodeMsgMap{
     {{.StructName}}CreateError:      "创建{{.Description}}失败",
     {{.StructName}}DeleteError:      "删除{{.Description}}失败",
     {{.StructName}}UpdateError:      "修改{{.Description}}失败",
