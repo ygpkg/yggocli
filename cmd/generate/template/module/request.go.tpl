@@ -1,27 +1,27 @@
-package dto{{.PackagePascalName}}
+package dto{{.PackageName}}
 
 import (
-	"{{.ProjectRootDir}}/internal/app/object/objCommon"
-	"{{.ProjectRootDir}}/internal/app/object/obj{{.PackagePascalName}}"
+	"{{.AppPathInProject}}/object/objcommon"
+	"{{.AppPathInProject}}/object/objuser"
 )
 
 type {{.StructName}}CreateReq struct {
-	obj{{.PackagePascalName}}.{{.StructName}}BaseInfo
+	obj{{.PackageName}}.{{.StructName}}BaseInfo
 }
 
 type {{.StructName}}UpdateReq struct {
-	ID uint64 `json:"id" validate:"required" label:"数据自增id"` // 数据自增id
-	obj{{.PackagePascalName}}.{{.StructName}}BaseInfo
+	ID uint `json:"id" validate:"required" label:"数据自增id"` // 数据自增id
+	obj{{.PackageName}}.{{.StructName}}BaseInfo
 }
 
 type {{.StructName}}DetailReq struct {
-	ID uint64 `json:"id" form:"id" validate:"required" label:"数据自增id"` // 数据自增id
+	ID uint `json:"id" form:"id" validate:"required" label:"数据自增id"` // 数据自增id
 }
 
 type {{.StructName}}PageListReq struct {
-	objCommon.PageQuery
+	objcommon.PageQuery
 }
 
 type {{.StructName}}DeleteReq struct {
-	ID uint64 `json:"id" form:"id" validate:"required" label:"数据自增id"` // 数据自增id
+	ID uint `json:"id" form:"id" validate:"required" label:"数据自增id"` // 数据自增id
 }

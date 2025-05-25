@@ -1,26 +1,26 @@
-package ctr{{.PackagePascalName}}
+package ctr{{.PackageName}}
 
 import (
-	"{{.ProjectRootDir}}/internal/app/dto/dto{{.PackagePascalName}}"
-	"{{.ProjectRootDir}}/internal/app/service/svc{{.PackagePascalName}}"
+    "{{.AppPathInProject}}/dto/dto{{.PackageName}}"
+    "{{.AppPathInProject}}/service/svc{{.PackageName}}"
 
-	"github.com/gin-gonic/gin"
-	"github.com/morehao/golib/gcontext/ginRender"
+    "github.com/gin-gonic/gin"
+    "github.com/morehao/golib/gcontext/gincontext"
 )
 {{if not .TargetFileExist}}
-type {{.ReceiverTypePascalName}}Ctr interface {
-	{{.FunctionName}}(c *gin.Context)
+type {{.StructName}}Ctr interface {
+	{{.FunctionName}}(ctx *gin.Context)
 }
 
-type {{.ReceiverTypeName}}Ctr struct {
-	{{.ReceiverTypeName}}Svc svc{{.PackagePascalName}}.{{.ReceiverTypePascalName}}Svc
+type {{.StructNameLowerCamel}}Ctr struct {
+	{{.StructNameLowerCamel}}Svc svc{{.PackageName}}.{{.StructName}}Svc
 }
 
-var _ {{.ReceiverTypePascalName}}Ctr = (*{{.ReceiverTypeName}}Ctr)(nil)
+var _ {{.StructName}}Ctr = (*{{.StructNameLowerCamel}}Ctr)(nil)
 
-func New{{.ReceiverTypePascalName}}Ctr() {{.ReceiverTypePascalName}}Ctr {
-	return &{{.ReceiverTypeName}}Ctr{
-		{{.ReceiverTypeName}}Svc: svc{{.PackagePascalName}}.New{{.ReceiverTypePascalName}}Svc(),
+func New{{.StructName}}Ctr() {{.StructName}}Ctr {
+	return &{{.StructNameLowerCamel}}Ctr{
+		{{.StructNameLowerCamel}}Svc: svc{{.PackageName}}.New{{.StructName}}Svc(),
 	}
 }
 {{end}}
@@ -30,21 +30,21 @@ func New{{.ReceiverTypePascalName}}Ctr() {{.ReceiverTypePascalName}}Ctr {
 // @Summary {{.Description}}
 // @accept application/json
 // @Produce application/json
-// @Param req body dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req true "{{.Description}}"
-// @Success 200 {object} dto.DefaultRender{data=dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router {{.ApiPrefix}}/{{.ApiSuffix}} [post]
-func (ctr *{{.ReceiverTypeName}}Ctr) {{.FunctionName}}(c *gin.Context) {
-	var req dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req
-	if err := c.ShouldBindJSON(&req); err != nil {
-		ginRender.Fail(c, err)
+// @Param req body dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req true "{{.Description}}"
+// @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
+// @Router /{{.AppName}}/{{.StructNameLowerCamel}}/{{.FunctionNameLowerCamel}} [post]
+func (ctr *{{.StructNameLowerCamel}}Ctr) {{.FunctionName}}(ctx *gin.Context) {
+	var req dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		gincontext.Fail(ctx, err)
 		return
 	}
-	res, err := ctr.{{.ReceiverTypeName}}Svc.{{.FunctionName}}(c, &req)
+	res, err := ctr.{{.StructNameLowerCamel}}Svc.{{.FunctionName}}(ctx, &req)
 	if err != nil {
-		ginRender.Fail(c, err)
+		gincontext.Fail(ctx, err)
 		return
 	} else {
-		ginRender.Success(c, res)
+		gincontext.Success(ctx, res)
 	}
 }
 {{else if eq .HttpMethod "GET"}}
@@ -53,21 +53,21 @@ func (ctr *{{.ReceiverTypeName}}Ctr) {{.FunctionName}}(c *gin.Context) {
 // @Summary {{.Description}}
 // @accept application/json
 // @Produce application/json
-// @Param req query dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req true "{{.Description}}"
-// @Success 200 {object} dto.DefaultRender{data=dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router {{.ApiPrefix}}/{{.ApiSuffix}} [get]
-func (ctr *{{.ReceiverTypeName}}Ctr){{.FunctionName}}(c *gin.Context) {
-	var req dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req
-	if err := c.ShouldBindQuery(&req); err != nil {
-		ginRender.Fail(c, err)
+// @Param req query dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req true "{{.Description}}"
+// @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
+// @Router /{{.AppName}}/{{.StructNameLowerCamel}}/{{.FunctionNameLowerCamel}} [get]
+func (ctr *{{.StructNameLowerCamel}}Ctr){{.FunctionName}}(ctx *gin.Context) {
+	var req dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		gincontext.Fail(ctx, err)
 		return
 	}
-	res, err := ctr.{{.ReceiverTypeName}}Svc.{{.FunctionName}}(c, &req)
+	res, err := ctr.{{.StructNameLowerCamel}}Svc.{{.FunctionName}}(ctx, &req)
 	if err != nil {
-		ginRender.Fail(c, err)
+		gincontext.Fail(ctx, err)
 		return
 	} else {
-		ginRender.Success(c, res)
+		gincontext.Success(ctx, res)
 	}
 }
 {{end}}

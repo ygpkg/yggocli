@@ -79,6 +79,7 @@ var Cmd = &cobra.Command{
 				fmt.Printf("Error generating api: %v\n", err)
 				return
 			}
+			fmt.Println("API generated successfully")
 
 		// 这里可以添加其他模式的处理逻辑
 		default:

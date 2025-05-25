@@ -13,22 +13,23 @@ func genModel() error {
 	modelGenCfg := cfg.Model
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
-	tplDir, err := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/model")
-	if err != nil {
-		return err
+	tplDir, getTplErr := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/model")
+	if getTplErr != nil {
+		return getTplErr
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
-	
+
 	analysisCfg := &codegen.ModuleCfg{
 		CommonConfig: codegen.CommonConfig{
-			TplDir:            tplDir,
 			PackageName:       modelGenCfg.PackageName,
+			TplDir:            tplDir,
 			RootDir:           workDir,
 			LayerParentDirMap: cfg.LayerParentDirMap,
 			LayerNameMap:      cfg.LayerNameMap,
 			LayerPrefixMap:    cfg.LayerPrefixMap,
 			TplFuncMap: template.FuncMap{
+				TplFuncIsBuiltInField:      IsBuiltInField,
 				TplFuncIsSysField:          IsSysField,
 				TplFuncIsDefaultModelLayer: IsDefaultModelLayer,
 				TplFuncIsDefaultDaoLayer:   IsDefaultDaoLayer,

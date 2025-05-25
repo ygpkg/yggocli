@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 
 	"github.com/morehao/golib/codegen"
@@ -16,24 +15,26 @@ func genModule() error {
 	moduleGenCfg := cfg.Module
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
-	tplDir, err := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/module")
-	if err != nil {
-		return err
+	tplDir, getTplErr := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/module")
+	if getTplErr != nil {
+		return getTplErr
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
 
-	rootDir := filepath.Join(workDir, moduleGenCfg.InternalAppRootDir)
 	analysisCfg := &codegen.ModuleCfg{
 		CommonConfig: codegen.CommonConfig{
-			TplDir:            tplDir,
 			PackageName:       moduleGenCfg.PackageName,
-			RootDir:           rootDir,
+			TplDir:            tplDir,
+			RootDir:           workDir,
 			LayerParentDirMap: cfg.LayerParentDirMap,
 			LayerNameMap:      cfg.LayerNameMap,
 			LayerPrefixMap:    cfg.LayerPrefixMap,
 			TplFuncMap: template.FuncMap{
-				TplFuncIsSysField: IsSysField,
+				TplFuncIsBuiltInField:      IsBuiltInField,
+				TplFuncIsSysField:          IsSysField,
+				TplFuncIsDefaultModelLayer: IsDefaultModelLayer,
+				TplFuncIsDefaultDaoLayer:   IsDefaultDaoLayer,
 			},
 		},
 		TableName: moduleGenCfg.TableName,
@@ -42,6 +43,16 @@ func genModule() error {
 	analysisRes, analysisErr := gen.AnalysisModuleTpl(MysqlClient, analysisCfg)
 	if analysisErr != nil {
 		return fmt.Errorf("analysis module tpl error: %v", analysisErr)
+	}
+
+	var modelLayerName, daoLayerName codegen.LayerName
+	for _, v := range analysisRes.TplAnalysisList {
+		if v.OriginLayerName == codegen.LayerNameModel {
+			modelLayerName = v.LayerName
+		}
+		if v.OriginLayerName == codegen.LayerNameDao {
+			daoLayerName = v.LayerName
+		}
 	}
 
 	var genParamsList []codegen.GenParamsItem
@@ -64,18 +75,20 @@ func genModule() error {
 			TargetFileName: v.TargetFilename,
 			Template:       v.Template,
 			ExtraParams: ModuleExtraParams{
-				PackageName:            analysisRes.PackageName,
-				ProjectRootDir:         moduleGenCfg.ProjectRootDir,
-				TableName:              analysisRes.TableName,
-				Description:            moduleGenCfg.Description,
-				StructName:             analysisRes.StructName,
-				ReceiverTypeName:       gutils.FirstLetterToLower(analysisRes.StructName),
-				ReceiverTypePascalName: analysisRes.StructName,
-				ApiDocTag:              moduleGenCfg.ApiDocTag,
-				ApiGroup:               moduleGenCfg.ApiGroup,
-				ApiPrefix:              strings.TrimSuffix(moduleGenCfg.ApiPrefix, "/"),
-				Template:               v.Template,
-				ModelFields:            modelFields,
+				AppInfo: AppInfo{
+					ProjectName:      cfg.appInfo.ProjectName,
+					AppPathInProject: cfg.appInfo.AppPathInProject,
+					AppName:          cfg.appInfo.AppName,
+				},
+				PackageName:          analysisRes.PackageName,
+				TableName:            analysisRes.TableName,
+				ModelLayerName:       string(modelLayerName),
+				DaoLayerName:         string(daoLayerName),
+				Description:          moduleGenCfg.Description,
+				StructName:           analysisRes.StructName,
+				StructNameLowerCamel: gutils.FirstLetterToLower(analysisRes.StructName),
+				Template:             v.Template,
+				ModelFields:          modelFields,
 			},
 		})
 
@@ -88,27 +101,30 @@ func genModule() error {
 	}
 
 	// 注册路由
-	routerCallContent := fmt.Sprintf("%sRouter(routerGroup)", gutils.FirstLetterToLower(analysisRes.StructName))
-	routerEnterFilepath := filepath.Join(rootDir, "/router/enter.go")
-	if err := gast.AddContentToFunc(routerEnterFilepath, "RegisterRouter", routerCallContent); err != nil {
-		return fmt.Errorf("appendContentToFunc error: %v", err)
+	routerContent := fmt.Sprintf("%sRouter(routerGroup)", gutils.FirstLetterToLower(analysisRes.StructName))
+	routerEnterFilepath := filepath.Join(workDir, "/router/enter.go")
+	if err := gast.AddContentToFunc(routerEnterFilepath, "RegisterRouter", routerContent); err != nil {
+		return fmt.Errorf("router appendContentToFunc error: %v", err)
+	}
+
+	// 注册错误码
+	codeContent := fmt.Sprintf("registerError(%sErrorMsgMap)", gutils.FirstLetterToLower(analysisRes.StructName))
+	codeEnterFilepath := filepath.Join(workDir, "/code/enter.go")
+	if err := gast.AddContentToFunc(codeEnterFilepath, "init", codeContent); err != nil {
+		return fmt.Errorf("code appendContentToFunc error: %v", err)
 	}
 	return nil
 }
 
 type ModuleExtraParams struct {
-	ServiceName            string
-	ProjectRootDir         string
-	PackageName            string
-	PackagePascalName      string
-	TableName              string
-	Description            string
-	StructName             string
-	ReceiverTypeName       string
-	ReceiverTypePascalName string
-	ApiGroup               string
-	ApiPrefix              string
-	ApiDocTag              string
-	Template               *template.Template
-	ModelFields            []ModelField
+	AppInfo
+	PackageName          string
+	ModelLayerName       string
+	DaoLayerName         string
+	TableName            string
+	Description          string
+	StructName           string
+	StructNameLowerCamel string // 结构体小写驼峰名
+	Template             *template.Template
+	ModelFields          []ModelField
 }

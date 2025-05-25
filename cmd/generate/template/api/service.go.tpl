@@ -1,26 +1,26 @@
-package svc{{.PackagePascalName}}
+package svc{{.PackageName}}
 
 import (
-    "{{.ProjectRootDir}}/internal/app/dto/dto{{.PackagePascalName}}"
+	"{{.AppPathInProject}}/dto/dto{{.PackageName}}"
 
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 )
 
 {{if not .TargetFileExist}}
-type {{.ReceiverTypePascalName}}Svc interface {
-    {{.FunctionName}}(c *gin.Context, req *dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req) (*dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp, error)
+type {{.StructName}}Svc interface {
+    {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req) (*dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp, error)
 }
 
-type {{.ReceiverTypeName}}Svc struct {
+type {{.StructNameLowerCamel}}Svc struct {
 }
 
-var _ {{.ReceiverTypePascalName}}Svc = (*{{.ReceiverTypeName}}Svc)(nil)
+var _ {{.StructName}}Svc = (*{{.StructNameLowerCamel}}Svc)(nil)
 
-func New{{.ReceiverTypePascalName}}Svc() {{.ReceiverTypePascalName}}Svc {
-    return &{{.ReceiverTypeName}}Svc{
+func New{{.StructName}}Svc() {{.StructName}}Svc {
+    return &{{.StructNameLowerCamel}}Svc{
     }
 }
 {{end}}
-func (svc *{{.ReceiverTypeName}}Svc) {{.FunctionName}}(c *gin.Context, req *dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Req) (*dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp, error) {
-    return &dto{{.PackagePascalName}}.{{.ReceiverTypePascalName}}{{.FunctionName}}Resp{}, nil
+func (svc *{{.StructNameLowerCamel}}Svc) {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req) (*dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp, error) {
+    return &dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp{}, nil
 }

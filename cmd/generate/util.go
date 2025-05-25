@@ -1,23 +1,38 @@
 package generate
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
 
 const (
+	TplFuncIsBuiltInField      = "isBuiltInField"
 	TplFuncIsSysField          = "isSysField"
 	TplFuncIsDefaultModelLayer = "isDefaultModelLayer"
 	TplFuncIsDefaultDaoLayer   = "isDefaultDaoLayer"
 )
 
+func IsBuiltInField(name string) bool {
+	buildInFieldMap := map[string]struct{}{
+		"ID":        {},
+		"CreatedAt": {},
+		"UpdatedAt": {},
+		"DeletedAt": {},
+	}
+	_, ok := buildInFieldMap[name]
+	return ok
+}
+
 func IsSysField(name string) bool {
 	sysFieldMap := map[string]struct{}{
-		"Id":        {},
+		"ID":        {},
 		"CreatedAt": {},
 		"CreatedBy": {},
 		"UpdatedAt": {},
@@ -111,4 +126,14 @@ func GetAppInfo(workDir string) (*AppInfo, error) {
 		ProjectName:      projectName,
 		AppName:          appName,
 	}, nil
+}
+
+// ExecuteCommand 执行命令并捕获输出
+func ExecuteCommand(root *cobra.Command, args ...string) (output string, err error) {
+	buf := new(bytes.Buffer)
+	root.SetOut(buf)
+	root.SetErr(buf)
+	root.SetArgs(args)
+	err = root.Execute()
+	return buf.String(), err
 }

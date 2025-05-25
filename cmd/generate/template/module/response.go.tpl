@@ -1,25 +1,25 @@
-package dto{{.PackagePascalName}}
+package dto{{.PackageName}}
 
 import (
-	"{{.ProjectRootDir}}/internal/app/object/objCommon"
-	"{{.ProjectRootDir}}/internal/app/object/obj{{.PackagePascalName}}"
+	"{{.AppPathInProject}}/object/objcommon"
+	"{{.AppPathInProject}}/object/objuser"
 )
 
 type {{.StructName}}CreateResp struct {
-	ID uint64 `json:"id"` // 数据自增id
+	ID uint `json:"id"` // 数据自增id
 }
 
 type {{.StructName}}DetailResp struct {
-	ID        uint64 `json:"id" validate:"required"` // 数据自增id
-	obj{{.PackagePascalName}}.{{.StructName}}BaseInfo
-	objCommon.OperatorBaseInfo
+	ID        uint `json:"id" validate:"required"` // 数据自增id
+	obj{{.PackageName}}.{{.StructName}}BaseInfo
+	objcommon.OperatorBaseInfo
 
 }
 
 type {{.StructName}}PageListItem struct {
-	ID        uint64 `json:"id" validate:"required"` // 数据自增id
-	obj{{.PackagePascalName}}.{{.StructName}}BaseInfo
-	objCommon.OperatorBaseInfo
+	ID        uint `json:"id" validate:"required"` // 数据自增id
+	obj{{.PackageName}}.{{.StructName}}BaseInfo
+	objcommon.OperatorBaseInfo
 }
 
 type {{.StructName}}PageListResp struct {

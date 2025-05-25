@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 
 	"github.com/morehao/golib/codegen"
@@ -16,19 +15,18 @@ func genApi() error {
 	apiGenCfg := cfg.Api
 
 	// 使用工具函数复制嵌入的模板文件到临时目录
-	tplDir, err := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/api")
-	if err != nil {
-		return err
+	tplDir, getTplErr := CopyEmbeddedTemplatesToTempDir(TemplatesFS, "template/api")
+	if getTplErr != nil {
+		return getTplErr
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
 
-	rootDir := filepath.Join(workDir, apiGenCfg.InternalAppRootDir)
 	analysisCfg := &codegen.ApiCfg{
 		CommonConfig: codegen.CommonConfig{
-			TplDir:            tplDir,
 			PackageName:       apiGenCfg.PackageName,
-			RootDir:           rootDir,
+			TplDir:            tplDir,
+			RootDir:           workDir,
 			LayerParentDirMap: cfg.LayerParentDirMap,
 			LayerNameMap:      cfg.LayerNameMap,
 			LayerPrefixMap:    cfg.LayerPrefixMap,
@@ -40,8 +38,11 @@ func genApi() error {
 	if analysisErr != nil {
 		return fmt.Errorf("analysis api tpl error: %v", analysisErr)
 	}
-	receiverTypePascalName := gutils.SnakeToPascal(apiGenCfg.SubModuleName)
-	receiverTypeName := gutils.FirstLetterToLower(receiverTypePascalName)
+
+	structName := gutils.SnakeToPascal(gutils.TrimFileExtension(apiGenCfg.TargetFilename))
+	structNameLowerCamel := gutils.FirstLetterToLower(structName)
+	functionName := gutils.FirstLetterToUpper(apiGenCfg.FunctionName)
+	functionNameLowerCamel := gutils.FirstLetterToLower(apiGenCfg.FunctionName)
 	var genParamsList []codegen.GenParamsItem
 	var isNewRouter, isNewController bool
 	var controllerFilepath, serviceFilepath string
@@ -50,7 +51,7 @@ func genApi() error {
 		case codegen.LayerNameRouter:
 			if v.TargetFileExist {
 				goFilepath := filepath.Join(v.TargetDir, v.TargetFilename)
-				funcName := fmt.Sprintf("%sRouter", gutils.FirstLetterToLower(apiGenCfg.SubModuleName))
+				funcName := fmt.Sprintf("%sRouter", structNameLowerCamel)
 				_, hasFunc, findFuncErr := gast.FindFunction(goFilepath, funcName)
 				if findFuncErr != nil {
 					return fmt.Errorf("find function error: %v", findFuncErr)
@@ -71,19 +72,21 @@ func genApi() error {
 			TargetFileName: v.TargetFilename,
 			Template:       v.Template,
 			ExtraParams: ApiExtraParams{
+				AppInfo: AppInfo{
+					ProjectName:      cfg.appInfo.ProjectName,
+					AppPathInProject: cfg.appInfo.AppPathInProject,
+					AppName:          cfg.appInfo.AppName,
+				},
 				PackageName:            analysisRes.PackageName,
-				ProjectRootDir:         apiGenCfg.ProjectRootDir,
 				TargetFileExist:        v.TargetFileExist,
 				IsNewRouter:            isNewRouter,
 				Description:            apiGenCfg.Description,
-				ReceiverTypeName:       receiverTypeName,
-				ReceiverTypePascalName: receiverTypePascalName,
+				StructName:             structName,
+				StructNameLowerCamel:   structNameLowerCamel,
+				FunctionName:           functionName,
+				FunctionNameLowerCamel: functionNameLowerCamel,
 				HttpMethod:             apiGenCfg.HttpMethod,
-				FunctionName:           gutils.FirstLetterToUpper(apiGenCfg.FunctionName),
 				ApiDocTag:              apiGenCfg.ApiDocTag,
-				ApiPrefix:              strings.TrimSuffix(apiGenCfg.ApiPrefix, "/"),
-				ApiSuffix:              strings.TrimLeft(apiGenCfg.ApiSuffix, "/"),
-				ApiGroup:               apiGenCfg.ApiGroup,
 				Template:               v.Template,
 			},
 		})
@@ -98,27 +101,27 @@ func genApi() error {
 
 	if !isNewController {
 		// 将方法添加到interface接口中
-		controllerInterfaceName := fmt.Sprintf("%sCtr", receiverTypePascalName)
-		if err := gast.AddMethodToInterface(controllerFilepath, receiverTypeName+"Ctr", apiGenCfg.FunctionName, controllerInterfaceName); err != nil {
+		controllerInterfaceName := fmt.Sprintf("%sCtr", structName)
+		if err := gast.AddMethodToInterface(controllerFilepath, structNameLowerCamel+"Ctr", functionName, controllerInterfaceName); err != nil {
 			return fmt.Errorf("add controller method to interface error: %w", err)
 		}
-		serviceInterfaceName := fmt.Sprintf("%sSvc", receiverTypePascalName)
-		if err := gast.AddMethodToInterface(serviceFilepath, receiverTypeName+"Svc", apiGenCfg.FunctionName, serviceInterfaceName); err != nil {
+		serviceInterfaceName := fmt.Sprintf("%sSvc", structName)
+		if err := gast.AddMethodToInterface(serviceFilepath, structNameLowerCamel+"Svc", functionName, serviceInterfaceName); err != nil {
 			return fmt.Errorf("add service method to interface error: %w", err)
 		}
 	}
 
 	// 	注册路由
 	if isNewRouter {
-		routerCallContent := fmt.Sprintf("%sRouter(routerGroup)", receiverTypeName)
-		routerEnterFilepath := filepath.Join(rootDir, "/router/enter.go")
+		routerCallContent := fmt.Sprintf("%sRouter(routerGroup)", structNameLowerCamel)
+		routerEnterFilepath := filepath.Join(workDir, "/router/enter.go")
 		if err := gast.AddContentToFunc(routerEnterFilepath, "RegisterRouter", routerCallContent); err != nil {
 			return fmt.Errorf("new router appendContentToFunc error: %v", err)
 		}
 	} else {
-		routerCallContent := fmt.Sprintf(`routerGroup.%s("/%s", %sCtr.%s) // %s`, apiGenCfg.HttpMethod, apiGenCfg.ApiSuffix, receiverTypeName, apiGenCfg.FunctionName, apiGenCfg.Description)
-		routerEnterFilepath := filepath.Join(rootDir, fmt.Sprintf("/router/%s.go", gutils.TrimFileExtension(apiGenCfg.TargetFilename)))
-		if err := gast.AddContentToFuncWithLineNumber(routerEnterFilepath, fmt.Sprintf("%sRouter", receiverTypeName), routerCallContent, -2); err != nil {
+		routerCallContent := fmt.Sprintf(`routerGroup.%s("/%s", %sCtr.%s) // %s`, apiGenCfg.HttpMethod, functionNameLowerCamel, structNameLowerCamel, functionName, apiGenCfg.Description)
+		routerEnterFilepath := filepath.Join(workDir, fmt.Sprintf("/router/%s.go", gutils.TrimFileExtension(apiGenCfg.PackageName)))
+		if err := gast.AddContentToFuncWithLineNumber(routerEnterFilepath, fmt.Sprintf("%sRouter", structNameLowerCamel), routerCallContent, -2); err != nil {
 			return fmt.Errorf("appendContentToFunc error: %v", err)
 		}
 	}
@@ -126,20 +129,16 @@ func genApi() error {
 }
 
 type ApiExtraParams struct {
-	ServiceName            string
-	ProjectRootDir         string
+	AppInfo
 	PackageName            string
-	PackagePascalName      string
 	Description            string
 	TargetFileExist        bool
 	IsNewRouter            bool
 	HttpMethod             string
+	StructName             string
+	StructNameLowerCamel   string
 	FunctionName           string
-	ReceiverTypeName       string
-	ReceiverTypePascalName string
-	ApiGroup               string
-	ApiPrefix              string
-	ApiSuffix              string
+	FunctionNameLowerCamel string
 	ApiDocTag              string
 	Template               *template.Template
 }

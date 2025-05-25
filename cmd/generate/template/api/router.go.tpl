@@ -1,17 +1,17 @@
 package router
 
 import (
-	"{{.ProjectRootDir}}/internal/app/controller/ctr{{.PackagePascalName}}"
+    "{{.AppPathInProject}}/controller/ctr{{.PackageName}}"
 
 	"github.com/gin-gonic/gin"
 )
 {{if .IsNewRouter}}
-// {{.ReceiverTypeName}}Router 初始化{{.Description}}路由信息
-func {{.ReceiverTypeName}}Router(routerGroup *gin.RouterGroup) {
-	{{.ReceiverTypeName}}Ctr := ctr{{.PackagePascalName}}.New{{.ReceiverTypePascalName}}Ctr()
-	{{.ReceiverTypeName}}Group := routerGroup.Group("{{.ApiGroup}}")
+// {{.StructNameLowerCamel}}Router 初始化{{.Description}}路由信息
+func {{.StructNameLowerCamel}}Router(routerGroup *gin.RouterGroup) {
+	{{.StructNameLowerCamel}}Ctr := ctr{{.PackageName}}.New{{.StructName}}Ctr()
+	{{.StructNameLowerCamel}}Group := routerGroup.Group("{{.StructNameLowerCamel}}")
 	{
-		{{.ReceiverTypeName}}Group.{{.HttpMethod}}("{{.ApiSuffix}}", {{.ReceiverTypeName}}Ctr.{{.FunctionName}})   // {{.Description}}
+		{{.StructNameLowerCamel}}Group.{{.HttpMethod}}("{{.FunctionNameLowerCamel}}", {{.StructNameLowerCamel}}Ctr.{{.FunctionName}})   // {{.Description}}
 	}
 }
 {{end}}
