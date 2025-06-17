@@ -48,7 +48,7 @@ func genApi() error {
 	var controllerFilepath, serviceFilepath string
 	for _, v := range analysisRes.TplAnalysisList {
 		switch v.LayerName {
-		case codegen.LayerNameAPI:
+		case codegen.LayerNameRouter:
 			if v.TargetFileExist {
 				goFilepath := filepath.Join(v.TargetDir, v.TargetFilename)
 				funcName := fmt.Sprintf("%sRouter", structNameLowerCamel)
