@@ -1,4 +1,4 @@
-package api
+package router
 
 import (
 	"{{.AppPathInProject}}/controller/ctr{{.PackageName}}"
