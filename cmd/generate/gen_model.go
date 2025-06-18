@@ -19,15 +19,28 @@ func genModel() error {
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
+	layerParentDirMap := map[codegen.LayerName]string{
+		codegen.LayerNameModel: "models",
+		codegen.LayerNameDao:   "models",
+	}
+
+	layerNameMap := map[codegen.LayerName]codegen.LayerName{
+		codegen.LayerNameModel: codegen.LayerName(fmt.Sprintf("%stype", cfg.appInfo.AppName)),
+		codegen.LayerNameDao:   codegen.LayerName("patent"),
+	}
+
+	layerPrefixMap := map[codegen.LayerName]codegen.LayerPrefix{
+		codegen.LayerNameDao: codegen.LayerPrefix(""),
+	}
 
 	analysisCfg := &codegen.ModuleCfg{
 		CommonConfig: codegen.CommonConfig{
-			PackageName:       modelGenCfg.PackageName,
+			PackageName:       "",
 			TplDir:            tplDir,
 			RootDir:           workDir,
-			LayerParentDirMap: cfg.LayerParentDirMap,
-			LayerNameMap:      cfg.LayerNameMap,
-			LayerPrefixMap:    cfg.LayerPrefixMap,
+			LayerParentDirMap: layerParentDirMap,
+			LayerNameMap:      layerNameMap,
+			LayerPrefixMap:    layerPrefixMap,
 			TplFuncMap: template.FuncMap{
 				TplFuncIsBuiltInField:      IsBuiltInField,
 				TplFuncIsSysField:          IsSysField,

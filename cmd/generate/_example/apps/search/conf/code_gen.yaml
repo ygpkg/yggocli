@@ -20,4 +20,3 @@ api:
   http_method: POST
   description: 删除登录记录
   api_doc_tag: 用户登录记录
-

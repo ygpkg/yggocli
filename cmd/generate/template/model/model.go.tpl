@@ -1,11 +1,11 @@
-package model
+package {{.AppName}}type
 
 import (
 	"gorm.io/gorm"
 )
 
-// {{.StructName}}Entity {{.Description}}表结构体
-type {{.StructName}}Entity struct {
+// {{.StructName}} {{.Description}}表结构体
+type {{.StructName}} struct {
     gorm.Model
 {{- range .ModelFields}}
     {{- if isBuiltInField .FieldName}}
@@ -16,16 +16,16 @@ type {{.StructName}}Entity struct {
 {{- end}}
 }
 
-type {{.StructName}}EntityList []{{.StructName}}Entity
+type {{.StructName}}List []{{.StructName}}
 
 const TableName{{.StructName}} = "{{.TableName}}"
 
-func ({{.StructName}}Entity ) TableName() string {
+func ({{.StructName}} ) TableName() string {
   return TableName{{.StructName}}
 }
 
-func (l {{.StructName}}EntityList) ToMap() map[uint]{{.StructName}}Entity {
-	m := make(map[uint]{{.StructName}}Entity)
+func (l {{.StructName}}List) ToMap() map[uint]{{.StructName}} {
+	m := make(map[uint]{{.StructName}})
 	for _, v := range l {
 		m[v.ID] = v
 	}

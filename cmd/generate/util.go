@@ -100,26 +100,28 @@ func GetAppInfo(workDir string) (*AppInfo, error) {
 	cleanPath := filepath.Clean(workDir)
 	segments := strings.Split(cleanPath, string(filepath.Separator))
 
-	// 查找 "internal/apps/{appName}" 结构
-	var internalIndex = -1
-	for i := 0; i < len(segments)-2; i++ {
-		if segments[i] == "internal" && segments[i+1] == "apps" {
-			internalIndex = i
+	// 查找 "apps/{appName}"
+	var appsIndex = -1
+	for i := 0; i < len(segments)-1; i++ {
+		if segments[i] == "apps" {
+			appsIndex = i
 			break
 		}
 	}
-	if internalIndex == -1 {
-		return nil, fmt.Errorf("invalid structure: path does not contain /internal/apps/{appName}")
+	if appsIndex == -1 {
+		return nil, fmt.Errorf("invalid structure: path does not contain /apps/{appName}")
 	}
 
+	appName := segments[appsIndex+1]
+
 	// 解析项目名、app名、相对路径
-	projectNameIndex := internalIndex - 1
+	projectNameIndex := appsIndex - 1
 	if projectNameIndex < 0 {
 		return nil, fmt.Errorf("cannot determine project name from path: %s", workDir)
 	}
 	projectName := segments[projectNameIndex]
-	appName := segments[internalIndex+2]
-	appPathInProject := filepath.Join(projectName, "internal", "apps", appName)
+
+	appPathInProject := filepath.Join(projectName, "apps", appName)
 
 	return &AppInfo{
 		AppPathInProject: appPathInProject,
