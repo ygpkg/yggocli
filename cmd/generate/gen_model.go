@@ -26,16 +26,21 @@ func genModel() error {
 
 	layerNameMap := map[codegen.LayerName]codegen.LayerName{
 		codegen.LayerNameModel: codegen.LayerName(fmt.Sprintf("%stype", cfg.appInfo.AppName)),
-		codegen.LayerNameDao:   codegen.LayerName("patent"),
+		codegen.LayerNameDao:   codegen.LayerName(""),
 	}
 
 	layerPrefixMap := map[codegen.LayerName]codegen.LayerPrefix{
 		codegen.LayerNameDao: codegen.LayerPrefix(""),
 	}
 
+	daoLayerName := cfg.appInfo.AppName
+	if modelGenCfg.DaoLayerName != "" {
+		daoLayerName = modelGenCfg.DaoLayerName
+	}
+
 	analysisCfg := &codegen.ModuleCfg{
 		CommonConfig: codegen.CommonConfig{
-			PackageName:       "",
+			PackageName:       daoLayerName,
 			TplDir:            tplDir,
 			RootDir:           workDir,
 			LayerParentDirMap: layerParentDirMap,
@@ -50,20 +55,11 @@ func genModel() error {
 		},
 		TableName: modelGenCfg.TableName,
 	}
+	fmt.Println("cfg:", gutils.ToJsonString(analysisCfg))
 	gen := codegen.NewGenerator()
 	analysisRes, analysisErr := gen.AnalysisModuleTpl(MysqlClient, analysisCfg)
 	if analysisErr != nil {
 		return fmt.Errorf("analysis model tpl error: %v", analysisErr)
-	}
-
-	var modelLayerName, daoLayerName codegen.LayerName
-	for _, v := range analysisRes.TplAnalysisList {
-		if v.OriginLayerName == codegen.LayerNameModel {
-			modelLayerName = v.LayerName
-		}
-		if v.OriginLayerName == codegen.LayerNameDao {
-			daoLayerName = v.LayerName
-		}
 	}
 
 	var genParamsList []codegen.GenParamsItem
@@ -91,14 +87,13 @@ func genModel() error {
 					AppPathInProject: cfg.appInfo.AppPathInProject,
 					AppName:          cfg.appInfo.AppName,
 				},
-				PackageName:    analysisRes.PackageName,
-				TableName:      analysisRes.TableName,
-				ModelLayerName: string(modelLayerName),
-				DaoLayerName:   string(daoLayerName),
-				Description:    modelGenCfg.Description,
-				StructName:     analysisRes.StructName,
-				Template:       v.Template,
-				ModelFields:    modelFields,
+				PackageName:  analysisRes.PackageName,
+				TableName:    analysisRes.TableName,
+				DaoLayerName: daoLayerName,
+				Description:  modelGenCfg.Description,
+				StructName:   analysisRes.StructName,
+				Template:     v.Template,
+				ModelFields:  modelFields,
 			},
 		})
 
