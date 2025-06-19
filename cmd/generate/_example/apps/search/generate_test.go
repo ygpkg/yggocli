@@ -1,4 +1,4 @@
-package demoapp
+package search
 
 import (
 	"testing"

@@ -7,10 +7,12 @@ mysql_dsn: root:123456@tcp(127.0.0.1:3306)/demo?charset=utf8mb4&parseTime=True&l
 #  dao: mysqldao
 module:
   package_name: user
+  dao_layer_name: patent
   description: 用户登录记录
   table_name: user_login_log
 model:
   package_name: user
+  dao_layer_name: patent
   description: 用户
   table_name: user
 api:
@@ -20,4 +22,3 @@ api:
   http_method: POST
   description: 删除登录记录
   api_doc_tag: 用户登录记录
-
