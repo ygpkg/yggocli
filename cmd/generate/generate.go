@@ -37,7 +37,7 @@ var Cmd = &cobra.Command{
 		currentDir, _ := os.Getwd()
 		workDir = currentDir
 		if cfg == nil {
-			configFilepath := filepath.Join(workDir, "conf", "code_gen.yaml")
+			configFilepath := filepath.Join(workDir, "conf/test", "code_gen.yaml")
 			conf.LoadConfig(configFilepath, &cfg)
 			appInfo, getAppInfoErr := GetAppInfo(workDir)
 			if getAppInfoErr != nil {

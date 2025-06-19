@@ -39,7 +39,7 @@ func (dao *{{.StructName}}Dao) WithTx(db *gorm.DB) *{{.StructName}}Dao {
 func (dao *{{.StructName}}Dao) Insert(ctx *gin.Context, entity *{{.AppName}}type.{{.StructName}}) error {
 	db := dao.DB(ctx).Table(dao.TableName())
 	if err := db.Create(entity).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] Insert fail, entity:%s, err: %v", logs.Json(entity), err)
+		return fmt.Errorf("[{{.StructName}}Dao] Insert fail, entity:%s, err: %v", logs.JSON(entity), err)
 	}
 	return nil
 }
@@ -51,7 +51,7 @@ func (dao *{{.StructName}}Dao) BatchInsert(ctx *gin.Context, entityList {{.AppNa
 
 	db := dao.DB(ctx).Table(dao.TableName())
 	if err := db.Create(entityList).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] BatchInsert fail, entityList:%s, err: %v", logs.Json(entityList), err)
+		return fmt.Errorf("[{{.StructName}}Dao] BatchInsert fail, entityList:%s, err: %v", logs.JSON(entityList), err)
 	}
 	return nil
 }
@@ -59,7 +59,7 @@ func (dao *{{.StructName}}Dao) BatchInsert(ctx *gin.Context, entityList {{.AppNa
 func (dao *{{.StructName}}Dao) UpdateByID(ctx *gin.Context, id uint, entity *{{.AppName}}type.{{.StructName}}) error {
 	db := dao.DB(ctx).Table(dao.TableName())
 	if err := db.Where("id = ?", id).Updates(entity).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] UpdateByID fail, id:%d, entity:%s, err: %v", id, logs.Json(entity), err)
+		return fmt.Errorf("[{{.StructName}}Dao] UpdateByID fail, id:%d, entity:%s, err: %v", id, logs.JSON(entity), err)
 	}
 	return nil
 }
@@ -67,7 +67,7 @@ func (dao *{{.StructName}}Dao) UpdateByID(ctx *gin.Context, id uint, entity *{{.
 func (dao *{{.StructName}}Dao) UpdateMap(ctx *gin.Context, id uint, updateMap map[string]interface{}) error {
 	db := dao.DB(ctx).Table(dao.TableName())
 	if err := db.Where("id = ?", id).Updates(updateMap).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] UpdateMap fail, id:%d, updateMap:%s, err: %v", id, logs.Json(entity), err)
+		return fmt.Errorf("[{{.StructName}}Dao] UpdateMap fail, id:%d, updateMap:%s, err: %v", id, logs.JSON(updateMap), err)
 	}
 	return nil
 }
@@ -87,7 +87,7 @@ func (dao *{{.StructName}}Dao) GetById(ctx *gin.Context, id uint) (*{{.AppName}}
 	var entity {{.AppName}}type.{{.StructName}}
 	db := dao.DB(ctx).Table(dao.TableName())
 	if err := db.Where("id = ?", id).Find(&entity).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] GetById fail, id:%d, err: %v", id, err)
+		return nil, fmt.Errorf("[{{.StructName}}Dao] GetById fail, id:%d, err: %v", id, err)
 	}
 	return &entity, nil
 }
@@ -99,7 +99,7 @@ func (dao *{{.StructName}}Dao) GetByCond(ctx *gin.Context, cond *{{.StructName}}
 	dao.BuildCondition(db, cond)
 
 	if err := db.Find(&entity).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] GetByCond fail, cond:%s, err: %v", logs.Json(cond), err)
+		return nil, fmt.Errorf("[{{.StructName}}Dao] GetByCond fail, cond:%s, err: %v", logs.JSON(cond), err)
 	}
 	return &entity, nil
 }
@@ -111,7 +111,7 @@ func (dao *{{.StructName}}Dao) GetListByCond(ctx *gin.Context, cond *{{.StructNa
 	dao.BuildCondition(db, cond)
 
 	if err := db.Find(&entityList).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] GetListByCond fail, cond:%s, err: %v", logs.Json(cond), err)
+		return nil, fmt.Errorf("[{{.StructName}}Dao] GetListByCond fail, cond:%s, err: %v", logs.JSON(cond), err)
 	}
 	return entityList, nil
 }
@@ -123,7 +123,7 @@ func (dao *{{.StructName}}Dao) GetPageListByCond(ctx *gin.Context, cond *{{.Stru
 
 	var count int64
 	if err := db.Count(&count).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] GetPageListByCond count fail, cond:%s, err: %v", logs.Json(cond), err)
+		return nil, 0, fmt.Errorf("[{{.StructName}}Dao] GetPageListByCond count fail, cond:%s, err: %v", logs.JSON(cond), err)
 	}
 	if cond.Limit > 0 {
 		db.Limit(cond.Limit)
@@ -133,7 +133,7 @@ func (dao *{{.StructName}}Dao) GetPageListByCond(ctx *gin.Context, cond *{{.Stru
 	}
 	var entityList {{.AppName}}type.{{.StructName}}List
 	if err := db.Find(&entityList).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] GetPageListByCond find fail, cond:%s, err: %v", logs.Json(cond), err)
+		return nil, 0, fmt.Errorf("[{{.StructName}}Dao] GetPageListByCond find fail, cond:%s, err: %v", logs.JSON(cond), err)
 	}
 	return entityList, count, nil
 }
@@ -144,7 +144,7 @@ func (dao *{{.StructName}}Dao) CountByCond(ctx *gin.Context, cond *{{.StructName
 	dao.BuildCondition(db, cond)
 	var count int64
 	if err := db.Count(&count).Error; err != nil {
-		return fmt.Errorf("[{{.StructName}}Dao] CountByCond fail, cond:%s, err: %v", logs.Json(cond), err)
+		return 0, fmt.Errorf("[{{.StructName}}Dao] CountByCond fail, cond:%s, err: %v", logs.JSON(cond), err)
 	}
 	return count, nil
 }
@@ -155,6 +155,4 @@ func (dao *{{.StructName}}Dao) BuildCondition(db *gorm.DB, cond *{{.StructName}}
 		query := fmt.Sprintf("%s.id = ?", dao.TableName())
 		db.Where(query, cond.ID)
 	}
-
-	return
 } 
