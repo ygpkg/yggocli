@@ -2,12 +2,10 @@ package generate
 
 import (
 	"fmt"
-	"go/ast"
-	"go/parser"
-	"go/printer"
-	"go/token"
+	"go/format"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/morehao/golib/codegen"
@@ -128,54 +126,72 @@ func genModel() error {
 	if err := gen.Gen(genParams); err != nil {
 		return err
 	}
-	addTableName(filepath.Join(workDir, modelLayerParentDir, string(modelLayerName), "db.go"), fmt.Sprintf("TableName%s", analysisRes.StructName), fmt.Sprintf("%q", analysisRes.TableName))
+	if err := addTableName(filepath.Join(workDir, modelLayerParentDir, string(modelLayerName), "db.go"), fmt.Sprintf("TableName%s", analysisRes.StructName), fmt.Sprintf("%q", analysisRes.TableName)); err != nil {
+		return err
+	}
 	return nil
 }
 
-// addTableName 将一个新的 const 常量添加到目标文件中第一个 const 块的末尾
+// addTableName 向指定文件第一个 const 块末尾添加一条常量定义，
+// 并用 go/format 格式化源码，避免格式混乱。
 func addTableName(filename, newConstName, newConstValue string) error {
-	fset := token.NewFileSet()
-	node, parseFileErr := parser.ParseFile(fset, filename, nil, parser.ParseComments)
-	if parseFileErr != nil {
-		return fmt.Errorf("failed to parse file: %v", parseFileErr)
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return fmt.Errorf("failed to read file: %w", err)
 	}
 
-	inserted := false
-	for _, decl := range node.Decls {
-		genDecl, ok := decl.(*ast.GenDecl)
-		if !ok || genDecl.Tok != token.CONST {
+	lines := strings.Split(string(content), "\n")
+
+	// 查找const块的结束位置（最后一个常量定义）
+	constStartIdx := -1
+	lastConstIdx := -1
+	inConstBlock := false
+
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+
+		// 检测const块开始
+		if strings.HasPrefix(trimmed, "const (") {
+			constStartIdx = i
+			inConstBlock = true
 			continue
 		}
 
-		// 构建新的 const ValueSpec
-		newSpec := &ast.ValueSpec{
-			Names:  []*ast.Ident{ast.NewIdent(newConstName)},
-			Values: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: newConstValue}},
+		// 检测const块结束
+		if inConstBlock && trimmed == ")" {
+			break
 		}
 
-		// 添加到 const block 的末尾
-		genDecl.Specs = append(genDecl.Specs, newSpec)
-
-		inserted = true
-		break // 只处理第一个 const 块
+		// 在const块中查找最后一个常量定义
+		if inConstBlock && (strings.Contains(trimmed, "=") ||
+			(strings.Contains(trimmed, `"`) && !strings.HasPrefix(trimmed, "//"))) {
+			lastConstIdx = i
+		}
 	}
 
-	if !inserted {
-		return fmt.Errorf("no const block found to insert into")
+	if constStartIdx == -1 || lastConstIdx == -1 {
+		return fmt.Errorf("could not find const block or last constant")
 	}
 
-	// 打开文件用于覆盖写入
-	outFile, rewriteErr := os.Create(filename)
-	if rewriteErr != nil {
-		return fmt.Errorf("failed to open file for writing: %v", rewriteErr)
-	}
-	defer outFile.Close()
+	// 构造新的常量定义
+	newConstLine := fmt.Sprintf("\t%s = %s", newConstName, newConstValue)
 
-	// 输出格式化 AST 到文件
-	if err := printer.Fprint(outFile, fset, node); err != nil {
-		return fmt.Errorf("failed to write modified file: %v", err)
+	// 插入新常量
+	newLines := make([]string, 0, len(lines)+1)
+	newLines = append(newLines, lines[:lastConstIdx+1]...)
+	newLines = append(newLines, newConstLine)
+	newLines = append(newLines, lines[lastConstIdx+1:]...)
+
+	// 写回文件
+	newContent := strings.Join(newLines, "\n")
+
+	// 使用go/format格式化整个文件
+	formatted, err := format.Source([]byte(newContent))
+	if err != nil {
+		return fmt.Errorf("failed to format source: %w", err)
 	}
-	return nil
+
+	return os.WriteFile(filename, formatted, 0644)
 }
 
 type ModelField struct {
