@@ -9,6 +9,14 @@ import (
 	"github.com/morehao/golib/gutils"
 )
 
+const (
+	modelLayerParentDir = "models"
+	modelLayerSuffix    = "type"
+
+	nullableDefaultDesc = "not null"
+	fieldDefaultKeyword = "default"
+)
+
 func genModel() error {
 	modelGenCfg := cfg.Model
 
@@ -20,12 +28,12 @@ func genModel() error {
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
 	layerParentDirMap := map[codegen.LayerName]string{
-		codegen.LayerNameModel: "models",
-		codegen.LayerNameDao:   "models",
+		codegen.LayerNameModel: modelLayerParentDir,
+		codegen.LayerNameDao:   modelLayerParentDir,
 	}
 
 	layerNameMap := map[codegen.LayerName]codegen.LayerName{
-		codegen.LayerNameModel: codegen.LayerName(fmt.Sprintf("%stype", cfg.appInfo.AppName)),
+		codegen.LayerNameModel: codegen.LayerName(fmt.Sprintf("%s%s", cfg.appInfo.AppName, modelLayerSuffix)),
 		codegen.LayerNameDao:   codegen.LayerName(""),
 	}
 
@@ -55,7 +63,6 @@ func genModel() error {
 		},
 		TableName: modelGenCfg.TableName,
 	}
-	fmt.Println("cfg:", gutils.ToJsonString(analysisCfg))
 	gen := codegen.NewGenerator()
 	analysisRes, analysisErr := gen.AnalysisModuleTpl(MysqlClient, analysisCfg)
 	if analysisErr != nil {
@@ -66,12 +73,23 @@ func genModel() error {
 	for _, v := range analysisRes.TplAnalysisList {
 		var modelFields []ModelField
 		for _, field := range v.ModelFields {
+			nullableDesc := nullableDefaultDesc
+			if field.IsNullable {
+				nullableDesc = ""
+			}
+			defaultValue := fmt.Sprintf("%s %s", fieldDefaultKeyword, field.DefaultValue)
+			if field.DefaultValue == "" {
+				defaultValue = ""
+			}
+
 			modelFields = append(modelFields, ModelField{
 				FieldName:          gutils.ReplaceIdToID(field.FieldName),
 				FieldLowerCaseName: gutils.SnakeToLowerCamel(field.FieldName),
 				FieldType:          field.FieldType,
 				ColumnName:         field.ColumnName,
 				ColumnType:         field.ColumnType,
+				NullableDesc:       nullableDesc,
+				DefaultValue:       defaultValue,
 				Comment:            field.Comment,
 				IsPrimaryKey:       field.ColumnKey == codegen.ColumnKeyPRI,
 			})
@@ -114,6 +132,8 @@ type ModelField struct {
 	ColumnName         string // 列名
 	ColumnType         string // 列数据类型，如varchar(255)
 	Comment            string // 字段注释
+	NullableDesc       string // 是否允许为空描述，如 NOT NULL
+	DefaultValue       string // 默认值,如 DEFAULT 0
 	IsPrimaryKey       bool   // 是否是主键
 }
 

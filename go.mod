@@ -1,10 +1,10 @@
 module github.com/ygpkg/yggocli
 
-go 1.23.3
+go 1.23.0
 
 require (
 	github.com/morehao/go-gitignore v0.0.0-20240726143401-bffa9ffa53e3
-	github.com/morehao/golib v1.2.13
+	github.com/morehao/golib v1.2.14
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/mod v0.25.0
 	gorm.io/driver/mysql v1.6.0
