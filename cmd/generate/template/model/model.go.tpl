@@ -18,8 +18,6 @@ type {{.StructName}} struct {
 
 type {{.StructName}}List []{{.StructName}}
 
-const TableName{{.StructName}} = "{{.TableName}}"
-
 func ({{.StructName}} ) TableName() string {
   return TableName{{.StructName}}
 }

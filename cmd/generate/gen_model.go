@@ -2,7 +2,12 @@ package generate
 
 import (
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/printer"
+	"go/token"
 	"os"
+	"path/filepath"
 	"text/template"
 
 	"github.com/morehao/golib/codegen"
@@ -32,8 +37,9 @@ func genModel() error {
 		codegen.LayerNameDao:   modelLayerParentDir,
 	}
 
+	modelLayerName := codegen.LayerName(fmt.Sprintf("%s%s", cfg.appInfo.AppName, modelLayerSuffix))
 	layerNameMap := map[codegen.LayerName]codegen.LayerName{
-		codegen.LayerNameModel: codegen.LayerName(fmt.Sprintf("%s%s", cfg.appInfo.AppName, modelLayerSuffix)),
+		codegen.LayerNameModel: modelLayerName,
 		codegen.LayerNameDao:   codegen.LayerName(""),
 	}
 
@@ -121,6 +127,53 @@ func genModel() error {
 	}
 	if err := gen.Gen(genParams); err != nil {
 		return err
+	}
+	addTableName(filepath.Join(workDir, modelLayerParentDir, string(modelLayerName), "db.go"), fmt.Sprintf("TableName%s", analysisRes.StructName), fmt.Sprintf("%q", analysisRes.TableName))
+	return nil
+}
+
+// addTableName 将一个新的 const 常量添加到目标文件中第一个 const 块的末尾
+func addTableName(filename, newConstName, newConstValue string) error {
+	fset := token.NewFileSet()
+	node, parseFileErr := parser.ParseFile(fset, filename, nil, parser.ParseComments)
+	if parseFileErr != nil {
+		return fmt.Errorf("failed to parse file: %v", parseFileErr)
+	}
+
+	inserted := false
+	for _, decl := range node.Decls {
+		genDecl, ok := decl.(*ast.GenDecl)
+		if !ok || genDecl.Tok != token.CONST {
+			continue
+		}
+
+		// 构建新的 const ValueSpec
+		newSpec := &ast.ValueSpec{
+			Names:  []*ast.Ident{ast.NewIdent(newConstName)},
+			Values: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: newConstValue}},
+		}
+
+		// 添加到 const block 的末尾
+		genDecl.Specs = append(genDecl.Specs, newSpec)
+
+		inserted = true
+		break // 只处理第一个 const 块
+	}
+
+	if !inserted {
+		return fmt.Errorf("no const block found to insert into")
+	}
+
+	// 打开文件用于覆盖写入
+	outFile, rewriteErr := os.Create(filename)
+	if rewriteErr != nil {
+		return fmt.Errorf("failed to open file for writing: %v", rewriteErr)
+	}
+	defer outFile.Close()
+
+	// 输出格式化 AST 到文件
+	if err := printer.Fprint(outFile, fset, node); err != nil {
+		return fmt.Errorf("failed to write modified file: %v", err)
 	}
 	return nil
 }
