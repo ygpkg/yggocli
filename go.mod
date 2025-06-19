@@ -1,4 +1,4 @@
-module github.com/morehao/gocli
+module github.com/ygpkg/yggocli
 
 go 1.23.3
 

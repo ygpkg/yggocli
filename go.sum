@@ -22,10 +22,6 @@ github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9G
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/morehao/go-gitignore v0.0.0-20240726143401-bffa9ffa53e3 h1:ANaXxExaKWL963++WBfC/p0jEPb0ZUWAiti09zpqzD8=
 github.com/morehao/go-gitignore v0.0.0-20240726143401-bffa9ffa53e3/go.mod h1:gThei7O/YvKiDN0wDd9KtH5wB/I8/TmPbRrAHESNwm4=
-github.com/morehao/golib v1.2.11 h1:qrxJs/kevLjqOw4nYUfVoDfvGogC15+u7R+p/y6TZ1g=
-github.com/morehao/golib v1.2.11/go.mod h1:P74NktaSlyfMt72brUPCc84Fp2c2E0Q0I5ITk4jyNVc=
-github.com/morehao/golib v1.2.12 h1:5PoOzTOz8J+dEqiAyQRtetTML8B6rvqoCz9c6uXDNM4=
-github.com/morehao/golib v1.2.12/go.mod h1:eyPDIKKYlzaj3gTQBn5GZl9iaGpA71kzHx/P9wjZOHo=
 github.com/morehao/golib v1.2.13 h1:PcIQ34tJtvRjdmbVs3DbgHfckzyKLUIUitPHYhzJISA=
 github.com/morehao/golib v1.2.13/go.mod h1:P74NktaSlyfMt72brUPCc84Fp2c2E0Q0I5ITk4jyNVc=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

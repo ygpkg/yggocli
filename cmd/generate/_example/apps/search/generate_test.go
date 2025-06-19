@@ -3,7 +3,7 @@ package search
 import (
 	"testing"
 
-	"github.com/morehao/gocli/cmd/generate"
+	"github.com/ygpkg/yggocli/cmd/generate"
 )
 
 func TestGenerateCommand(t *testing.T) {

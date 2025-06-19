@@ -3,14 +3,14 @@ package cmd
 import (
 	"os"
 
-	"github.com/morehao/gocli/cmd/cutter"
-	"github.com/morehao/gocli/cmd/generate"
 	"github.com/spf13/cobra"
+	"github.com/ygpkg/yggocli/cmd/cutter"
+	"github.com/ygpkg/yggocli/cmd/generate"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "gocli",
+	Use:   "yggocli",
 	Short: "A brief description of your application",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For _example:
