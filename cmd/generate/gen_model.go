@@ -30,6 +30,7 @@ func genModel() error {
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
+	
 	layerParentDirMap := map[codegen.LayerName]string{
 		codegen.LayerNameModel: modelLayerParentDir,
 		codegen.LayerNameDao:   modelLayerParentDir,

@@ -1,26 +1,12 @@
 package svc{{.PackageName}}
 
 import (
-	"{{.AppPathInProject}}/dto/dto{{.PackageName}}"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/internal/dto/dto{{.PackageName}}"
 )
 
-{{if not .TargetFileExist}}
-type {{.StructName}}Svc interface {
-    {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req) (*dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp, error)
-}
-
-type {{.StructNameLowerCamel}}Svc struct {
-}
-
-var _ {{.StructName}}Svc = (*{{.StructNameLowerCamel}}Svc)(nil)
-
-func New{{.StructName}}Svc() {{.StructName}}Svc {
-    return &{{.StructNameLowerCamel}}Svc{
-    }
-}
-{{end}}
-func (svc *{{.StructNameLowerCamel}}Svc) {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req) (*dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp, error) {
-    return &dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp{}, nil
+func {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.FunctionName}}Request, resp *dto{{.PackageName}}.{{.FunctionName}}Response) error {
+	return nil
 }

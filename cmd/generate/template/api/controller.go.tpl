@@ -1,73 +1,33 @@
-package ctr{{.PackageName}}
+package apis
 
 import (
-    "{{.AppPathInProject}}/dto/dto{{.PackageName}}"
-    "{{.AppPathInProject}}/service/svc{{.PackageName}}"
-
-    "github.com/gin-gonic/gin"
-    "github.com/morehao/golib/gcontext/gincontext"
+	"github.com/gin-gonic/gin"
+	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/internal/dto/dto{{.PackageName}}"
+	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/internal/services/svc{{.PackageName}}"
+	"github.com/openrpacloud/{{.ProjectName}}/pkgs/apis/errcode"
+	"github.com/ygpkg/yg-go/apis/apiobj"
+	"github.com/ygpkg/yg-go/logs"
+	"github.com/ygpkg/yg-go/validate"
 )
-{{if not .TargetFileExist}}
-type {{.StructName}}Ctr interface {
-	{{.FunctionName}}(ctx *gin.Context)
-}
 
-type {{.StructNameLowerCamel}}Ctr struct {
-	{{.StructNameLowerCamel}}Svc svc{{.PackageName}}.{{.StructName}}Svc
-}
-
-var _ {{.StructName}}Ctr = (*{{.StructNameLowerCamel}}Ctr)(nil)
-
-func New{{.StructName}}Ctr() {{.StructName}}Ctr {
-	return &{{.StructNameLowerCamel}}Ctr{
-		{{.StructNameLowerCamel}}Svc: svc{{.PackageName}}.New{{.StructName}}Svc(),
-	}
-}
-{{end}}
-{{if eq .HttpMethod "POST"}}
 // {{.FunctionName}} {{.Description}}
-// @Tags {{.ApiDocTag}}
+// @Tags LLM {{.ApiDocTag}}
 // @Summary {{.Description}}
-// @accept application/json
-// @Produce application/json
-// @Param req body dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req true "{{.Description}}"
-// @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router /{{.AppName}}/{{.StructNameLowerCamel}}/{{.FunctionNameLowerCamel}} [post]
-func (ctr *{{.StructNameLowerCamel}}Ctr) {{.FunctionName}}(ctx *gin.Context) {
-	var req dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		gincontext.Fail(ctx, err)
+// @Description {{.Description}}
+// @Router /admin.{{.FunctionName}} [post]
+// @Param request body dto{{.PackageName}}.{{.FunctionName}}Request true "request"
+// @Success 200 {object} dto{{.PackageName}}.{{.FunctionName}}Response "response"
+func {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.FunctionName}}Request, resp *dto{{.PackageName}}.{{.FunctionName}}Response) {
+	if err := validate.IsValidStruct(req, false); err != nil {
+		resp.Code = errcode.ErrCode_BadRequest
+		resp.Message = err.Error()
+		logs.ErrorContextf(ctx, "[{{.FunctionName}}] validate.IsValidStruct failed, err:%v, req:%s", err, logs.JSON(req))
 		return
 	}
-	res, err := ctr.{{.StructNameLowerCamel}}Svc.{{.FunctionName}}(ctx, &req)
-	if err != nil {
-		gincontext.Fail(ctx, err)
+	if err := svcllminstruction.{{.FunctionName}}(ctx, req, resp); err != nil {
+		logs.ErrorContextf(ctx, "[{{.FunctionName}}] svc{{.PackageName}}.{{.FunctionName}} failed, err:%v, req:%s", err, logs.JSON(req))
+		resp.Code = errcode.ErrCode_{{.FunctionName}}
+		resp.Message = errcode.GetMessage(errcode.ErrCode_{{.FunctionName}})
 		return
-	} else {
-		gincontext.Success(ctx, res)
 	}
 }
-{{else if eq .HttpMethod "GET"}}
-// {{.FunctionName}} {{.Description}}
-// @Tags {{.ApiDocTag}}
-// @Summary {{.Description}}
-// @accept application/json
-// @Produce application/json
-// @Param req query dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req true "{{.Description}}"
-// @Success 200 {object} gincontext.DtoRender{data=dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Resp} "{"code": 0,"data": "ok","msg": "success"}"
-// @Router /{{.AppName}}/{{.StructNameLowerCamel}}/{{.FunctionNameLowerCamel}} [get]
-func (ctr *{{.StructNameLowerCamel}}Ctr){{.FunctionName}}(ctx *gin.Context) {
-	var req dto{{.PackageName}}.{{.StructName}}{{.FunctionName}}Req
-	if err := ctx.ShouldBindQuery(&req); err != nil {
-		gincontext.Fail(ctx, err)
-		return
-	}
-	res, err := ctr.{{.StructNameLowerCamel}}Svc.{{.FunctionName}}(ctx, &req)
-	if err != nil {
-		gincontext.Fail(ctx, err)
-		return
-	} else {
-		gincontext.Success(ctx, res)
-	}
-}
-{{end}}

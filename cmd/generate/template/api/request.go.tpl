@@ -1,4 +1,13 @@
 package dto{{.PackageName}}
 
-type {{.StructName}}{{.FunctionName}}Req struct {
+import (
+	"github.com/ygpkg/yg-go/apis/apiobj"
+)
+
+type {{.FunctionName}}Request struct {
+	apiobj.BaseRequest
+	Request {{.FunctionName}}EmbedRequest
+}
+
+type {{.FunctionName}}EmbedRequest struct {
 }

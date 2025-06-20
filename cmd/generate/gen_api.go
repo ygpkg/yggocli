@@ -7,8 +7,12 @@ import (
 	"text/template"
 
 	"github.com/morehao/golib/codegen"
-	"github.com/morehao/golib/gast"
 	"github.com/morehao/golib/gutils"
+)
+
+const (
+	controllerLayerName = "apis"
+	serviceLayerName    = "services"
 )
 
 func genApi() error {
@@ -22,14 +26,28 @@ func genApi() error {
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
 
+	layerParentDirMap := map[codegen.LayerName]string{
+		// codegen.LayerNameController: controllerLayerParentDir,
+		// codegen.LayerNameService:    serviceLayerParentDir,
+	}
+
+	layerNameMap := map[codegen.LayerName]codegen.LayerName{
+		codegen.LayerNameController: controllerLayerName,
+		codegen.LayerNameService:    serviceLayerName,
+	}
+
+	layerPrefixMap := map[codegen.LayerName]codegen.LayerPrefix{
+		codegen.LayerNameController: codegen.LayerPrefix(""),
+	}
+
 	analysisCfg := &codegen.ApiCfg{
 		CommonConfig: codegen.CommonConfig{
 			PackageName:       apiGenCfg.PackageName,
 			TplDir:            tplDir,
 			RootDir:           workDir,
-			LayerParentDirMap: cfg.LayerParentDirMap,
-			LayerNameMap:      cfg.LayerNameMap,
-			LayerPrefixMap:    cfg.LayerPrefixMap,
+			LayerParentDirMap: layerParentDirMap,
+			LayerNameMap:      layerNameMap,
+			LayerPrefixMap:    layerPrefixMap,
 		},
 		TargetFilename: apiGenCfg.TargetFilename,
 	}
@@ -44,30 +62,9 @@ func genApi() error {
 	functionName := gutils.FirstLetterToUpper(apiGenCfg.FunctionName)
 	functionNameLowerCamel := gutils.FirstLetterToLower(apiGenCfg.FunctionName)
 	var genParamsList []codegen.GenParamsItem
-	var isNewRouter, isNewController bool
-	var controllerFilepath, serviceFilepath string
-	for _, v := range analysisRes.TplAnalysisList {
-		switch v.LayerName {
-		case codegen.LayerNameRouter:
-			if v.TargetFileExist {
-				goFilepath := filepath.Join(v.TargetDir, v.TargetFilename)
-				funcName := fmt.Sprintf("%sRouter", structNameLowerCamel)
-				_, hasFunc, findFuncErr := gast.FindFunction(goFilepath, funcName)
-				if findFuncErr != nil {
-					return fmt.Errorf("find function error: %v", findFuncErr)
-				}
-				isNewRouter = !hasFunc
-			} else {
-				isNewRouter = true
-			}
-		case codegen.LayerNameController:
-			controllerFilepath = filepath.Join(v.TargetDir, v.TargetFilename)
-			isNewController = !v.TargetFileExist
-		case codegen.LayerNameService:
-			serviceFilepath = filepath.Join(v.TargetDir, v.TargetFilename)
-		}
 
-		genParamsList = append(genParamsList, codegen.GenParamsItem{
+	for _, v := range analysisRes.TplAnalysisList {
+		param := codegen.GenParamsItem{
 			TargetDir:      v.TargetDir,
 			TargetFileName: v.TargetFilename,
 			Template:       v.Template,
@@ -79,7 +76,6 @@ func genApi() error {
 				},
 				PackageName:            analysisRes.PackageName,
 				TargetFileExist:        v.TargetFileExist,
-				IsNewRouter:            isNewRouter,
 				Description:            apiGenCfg.Description,
 				StructName:             structName,
 				StructNameLowerCamel:   structNameLowerCamel,
@@ -89,7 +85,11 @@ func genApi() error {
 				ApiDocTag:              apiGenCfg.ApiDocTag,
 				Template:               v.Template,
 			},
-		})
+		}
+		if v.LayerName == controllerLayerName {
+			param.TargetDir = filepath.Dir(v.TargetDir)
+		}
+		genParamsList = append(genParamsList, param)
 
 	}
 	genParams := &codegen.GenParams{
@@ -98,33 +98,11 @@ func genApi() error {
 	if err := gen.Gen(genParams); err != nil {
 		return err
 	}
-
-	if !isNewController {
-		// 将方法添加到interface接口中
-		controllerInterfaceName := fmt.Sprintf("%sCtr", structName)
-		if err := gast.AddMethodToInterface(controllerFilepath, structNameLowerCamel+"Ctr", functionName, controllerInterfaceName); err != nil {
-			return fmt.Errorf("add controller method to interface error: %w", err)
-		}
-		serviceInterfaceName := fmt.Sprintf("%sSvc", structName)
-		if err := gast.AddMethodToInterface(serviceFilepath, structNameLowerCamel+"Svc", functionName, serviceInterfaceName); err != nil {
-			return fmt.Errorf("add service method to interface error: %w", err)
-		}
-	}
-
-	// 	注册路由
-	if isNewRouter {
-		routerCallContent := fmt.Sprintf("%sRouter(routerGroup)", structNameLowerCamel)
-		routerEnterFilepath := filepath.Join(workDir, "/router/enter.go")
-		if err := gast.AddContentToFunc(routerEnterFilepath, "RegisterRouter", routerCallContent); err != nil {
-			return fmt.Errorf("new router appendContentToFunc error: %v", err)
-		}
-	} else {
-		routerCallContent := fmt.Sprintf(`routerGroup.%s("/%s", %sCtr.%s) // %s`, apiGenCfg.HttpMethod, functionNameLowerCamel, structNameLowerCamel, functionName, apiGenCfg.Description)
-		routerEnterFilepath := filepath.Join(workDir, fmt.Sprintf("/router/%s.go", gutils.TrimFileExtension(apiGenCfg.PackageName)))
-		if err := gast.AddContentToFuncWithLineNumber(routerEnterFilepath, fmt.Sprintf("%sRouter", structNameLowerCamel), routerCallContent, -2); err != nil {
-			return fmt.Errorf("appendContentToFunc error: %v", err)
-		}
-	}
+	// routerCallContent := fmt.Sprintf(`routerGroup.%s("/%s", %sCtr.%s) // %s`, apiGenCfg.HttpMethod, functionNameLowerCamel, structNameLowerCamel, functionName, apiGenCfg.Description)
+	// routerEnterFilepath := filepath.Join(workDir, fmt.Sprintf("/router/%s.go", gutils.TrimFileExtension(apiGenCfg.PackageName)))
+	// if err := gast.AddContentToFuncWithLineNumber(routerEnterFilepath, fmt.Sprintf("%sRouter", structNameLowerCamel), routerCallContent, -2); err != nil {
+	// 	return fmt.Errorf("appendContentToFunc error: %v", err)
+	// }
 	return nil
 }
 
@@ -133,7 +111,6 @@ type ApiExtraParams struct {
 	PackageName            string
 	Description            string
 	TargetFileExist        bool
-	IsNewRouter            bool
 	HttpMethod             string
 	StructName             string
 	StructNameLowerCamel   string

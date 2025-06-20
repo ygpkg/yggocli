@@ -63,11 +63,13 @@ var Cmd = &cobra.Command{
 
 		switch mode {
 		case "module":
-			if err := genModule(); err != nil {
-				fmt.Printf("Error generating module: %v\n", err)
-				return
-			}
-			fmt.Println("Module generated successfully")
+			fmt.Println("unsupported mode: module")
+			return
+			// if err := genModule(); err != nil {
+			// 	fmt.Printf("Error generating module: %v\n", err)
+			// 	return
+			// }
+			// fmt.Println("Module generated successfully")
 		case "model":
 			if err := genModel(); err != nil {
 				fmt.Printf("Error generating model: %v\n", err)
