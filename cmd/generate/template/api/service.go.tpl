@@ -1,8 +1,6 @@
 package svc{{.PackageName}}
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/internal/dto/dto{{.PackageName}}"
 )

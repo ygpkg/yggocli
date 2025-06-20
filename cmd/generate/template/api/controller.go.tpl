@@ -5,7 +5,6 @@ import (
 	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/internal/dto/dto{{.PackageName}}"
 	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/internal/services/svc{{.PackageName}}"
 	"github.com/openrpacloud/{{.ProjectName}}/pkgs/apis/errcode"
-	"github.com/ygpkg/yg-go/apis/apiobj"
 	"github.com/ygpkg/yg-go/logs"
 	"github.com/ygpkg/yg-go/validate"
 )
@@ -14,7 +13,7 @@ import (
 // @Tags LLM {{.ApiDocTag}}
 // @Summary {{.Description}}
 // @Description {{.Description}}
-// @Router /admin.{{.FunctionName}} [post]
+// @Router /{{.AppName}}.{{.FunctionName}} [post]
 // @Param request body dto{{.PackageName}}.{{.FunctionName}}Request true "request"
 // @Success 200 {object} dto{{.PackageName}}.{{.FunctionName}}Response "response"
 func {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.FunctionName}}Request, resp *dto{{.PackageName}}.{{.FunctionName}}Response) {
@@ -24,7 +23,8 @@ func {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.FunctionNam
 		logs.ErrorContextf(ctx, "[{{.FunctionName}}] validate.IsValidStruct failed, err:%v, req:%s", err, logs.JSON(req))
 		return
 	}
-	if err := svcllminstruction.{{.FunctionName}}(ctx, req, resp); err != nil {
+	// TODO: 需要手动注册路由 and 手动定义错误码
+	if err := svc{{.PackageName}}.{{.FunctionName}}(ctx, req, resp); err != nil {
 		logs.ErrorContextf(ctx, "[{{.FunctionName}}] svc{{.PackageName}}.{{.FunctionName}} failed, err:%v, req:%s", err, logs.JSON(req))
 		resp.Code = errcode.ErrCode_{{.FunctionName}}
 		resp.Message = errcode.GetMessage(errcode.ErrCode_{{.FunctionName}})

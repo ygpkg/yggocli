@@ -13,6 +13,8 @@ import (
 const (
 	controllerLayerName = "apis"
 	serviceLayerName    = "services"
+
+	internalDirName = "internal"
 )
 
 func genApi() error {
@@ -27,8 +29,9 @@ func genApi() error {
 	defer os.RemoveAll(tplDir)
 
 	layerParentDirMap := map[codegen.LayerName]string{
-		// codegen.LayerNameController: controllerLayerParentDir,
-		// codegen.LayerNameService:    serviceLayerParentDir,
+		// codegen.LayerNameController: internalDirName,
+		// codegen.LayerNameService:    internalDirName,
+		// codegen.LayerNameDto:        internalDirName,
 	}
 
 	layerNameMap := map[codegen.LayerName]codegen.LayerName{
@@ -44,7 +47,7 @@ func genApi() error {
 		CommonConfig: codegen.CommonConfig{
 			PackageName:       apiGenCfg.PackageName,
 			TplDir:            tplDir,
-			RootDir:           workDir,
+			RootDir:           filepath.Join(workDir, internalDirName),
 			LayerParentDirMap: layerParentDirMap,
 			LayerNameMap:      layerNameMap,
 			LayerPrefixMap:    layerPrefixMap,
