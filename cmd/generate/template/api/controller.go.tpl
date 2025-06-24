@@ -10,7 +10,7 @@ import (
 )
 
 // {{.FunctionName}} {{.Description}}
-// @Tags LLM {{.ApiDocTag}}
+// @Tags {{.ApiDocTag}}
 // @Summary {{.Description}}
 // @Description {{.Description}}
 // @Router /{{.AppName}}.{{.FunctionName}} [post]
