@@ -1,4 +1,4 @@
-package {{.AppName}}type
+package {{.ModelLayerName}}
 
 import (
 	"gorm.io/gorm"
