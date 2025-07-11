@@ -37,10 +37,11 @@ type ModuleConfig struct {
 }
 
 type ModelConfig struct {
-	PackageName  string `yaml:"package_name"`   // 包名
-	DaoLayerName string `yaml:"dao_layer_name"` // dao层名称
-	Description  string `yaml:"description"`    // 描述
-	TableName    string `yaml:"table_name"`     // 表名
+	PackageName    string `yaml:"package_name"`     // 包名
+	ModelLayerName string `yaml:"model_layer_name"` // model层名称
+	DaoLayerName   string `yaml:"dao_layer_name"`   // dao层名称
+	Description    string `yaml:"description"`      // 描述
+	TableName      string `yaml:"table_name"`       // 表名
 }
 
 type ApiConfig struct {

@@ -30,15 +30,18 @@ func genModel() error {
 	}
 	// 清理临时目录
 	defer os.RemoveAll(tplDir)
-	
+
 	layerParentDirMap := map[codegen.LayerName]string{
 		codegen.LayerNameModel: modelLayerParentDir,
 		codegen.LayerNameDao:   modelLayerParentDir,
 	}
 
-	modelLayerName := codegen.LayerName(fmt.Sprintf("%s%s", cfg.appInfo.AppName, modelLayerSuffix))
+	modelLayerName := fmt.Sprintf("%s%s", cfg.appInfo.AppName, modelLayerSuffix)
+	if modelGenCfg.ModelLayerName != "" {
+		modelLayerName = modelGenCfg.ModelLayerName
+	}
 	layerNameMap := map[codegen.LayerName]codegen.LayerName{
-		codegen.LayerNameModel: modelLayerName,
+		codegen.LayerNameModel: codegen.LayerName(modelLayerName),
 		codegen.LayerNameDao:   codegen.LayerName(""),
 	}
 
@@ -110,13 +113,14 @@ func genModel() error {
 					AppPathInProject: cfg.appInfo.AppPathInProject,
 					AppName:          cfg.appInfo.AppName,
 				},
-				PackageName:  analysisRes.PackageName,
-				TableName:    analysisRes.TableName,
-				DaoLayerName: daoLayerName,
-				Description:  modelGenCfg.Description,
-				StructName:   analysisRes.StructName,
-				Template:     v.Template,
-				ModelFields:  modelFields,
+				PackageName:    analysisRes.PackageName,
+				TableName:      analysisRes.TableName,
+				ModelLayerName: modelLayerName,
+				DaoLayerName:   daoLayerName,
+				Description:    modelGenCfg.Description,
+				StructName:     analysisRes.StructName,
+				Template:       v.Template,
+				ModelFields:    modelFields,
 			},
 		})
 
