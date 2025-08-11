@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/models"
 	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/models/{{.ModelLayerName}}"
 	"github.com/ygpkg/yg-go/apis/apiobj"
 	"github.com/ygpkg/yg-go/logs"
@@ -13,13 +12,13 @@ import (
 )
 
 type {{.StructName}}Cond struct {
-	models.BaseCond
+	BaseCond
 	Filters      []apiobj.Filter
 	ID 			 uint
 }
 
 type {{.StructName}}Dao struct {
-	models.BaseModel
+	BaseModel
 }
 
 func New{{.StructName}}Dao() *{{.StructName}}Dao {
@@ -32,7 +31,7 @@ func (dao *{{.StructName}}Dao) TableName() string {
 
 func (dao *{{.StructName}}Dao) WithTx(db *gorm.DB) *{{.StructName}}Dao {
 	return &{{.StructName}}Dao{
-		BaseModel: models.BaseModel{DBClient: db},
+		BaseModel: BaseModel{DBClient: db},
 	}
 }
 
@@ -83,11 +82,11 @@ func (dao *{{.StructName}}Dao) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (dao *{{.StructName}}Dao) GetById(ctx context.Context, id uint) (*{{.ModelLayerName}}.{{.StructName}}, error) {
+func (dao *{{.StructName}}Dao) GetByID(ctx context.Context, id uint) (*{{.ModelLayerName}}.{{.StructName}}, error) {
 	var entity {{.ModelLayerName}}.{{.StructName}}
 	db := dao.DB(ctx).Table(dao.TableName())
 	if err := db.Where("id = ?", id).Find(&entity).Error; err != nil {
-		return nil, fmt.Errorf("[{{.StructName}}Dao] GetById fail, id:%d, err: %v", id, err)
+		return nil, fmt.Errorf("[{{.StructName}}Dao] GetByID fail, id:%d, err: %v", id, err)
 	}
 	return &entity, nil
 }
