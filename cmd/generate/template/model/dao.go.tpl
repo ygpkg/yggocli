@@ -138,7 +138,7 @@ func (dao *{{.StructName}}Dao) GetPageListByCond(ctx context.Context, cond *{{.S
 }
 
 func (dao *{{.StructName}}Dao) CountByCond(ctx context.Context, cond *{{.StructName}}Cond) (int64, error) {
-	db := dao.DB(ctx).Table(dao.TableName())
+	db := dao.DB(ctx).Model(&{{.ModelLayerName}}.{{.StructName}}{}).Table(dao.TableName())
 
 	dao.BuildCondition(db, cond)
 	var count int64
