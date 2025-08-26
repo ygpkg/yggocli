@@ -116,7 +116,7 @@ func (dao *{{.StructName}}Dao) GetListByCond(ctx context.Context, cond *{{.Struc
 }
 
 func (dao *{{.StructName}}Dao) GetPageListByCond(ctx context.Context, cond *{{.StructName}}Cond) ({{.ModelLayerName}}.{{.StructName}}List, int64, error) {
-	db := dao.DB(ctx).Table(dao.TableName())
+	db := dao.DB(ctx).Model(&{{.ModelLayerName}}.{{.StructName}}{}).Table(dao.TableName())
 
 	dao.BuildCondition(db, cond)
 
