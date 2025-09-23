@@ -11,3 +11,6 @@ type {{.FunctionName}}Request struct {
 
 type {{.FunctionName}}EmbedRequest struct {
 }
+
+func (opt *{{.FunctionName}}Request) Validity(resp *{{.FunctionName}}Response) {
+}

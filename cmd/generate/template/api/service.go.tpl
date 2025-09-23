@@ -6,6 +6,6 @@ import (
 )
 
 func {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.FunctionName}}Request) (res *dto{{.PackageName}}.{{.FunctionName}}Response, err error) {
-	res = &dto{{.PackageName}}.{{.FunctionName}}Response
+	res = &dto{{.PackageName}}.{{.FunctionName}}Response{}
 	return res, nil
 }
