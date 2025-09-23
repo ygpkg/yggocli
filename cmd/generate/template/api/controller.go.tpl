@@ -21,7 +21,7 @@ func {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.FunctionNam
 		return
 	}
 
-	// TODO: 需要手动注册路由
+	// TODO: 需要手动注册路由和修改 Message 的值
 	res, err := svc{{.PackageName}}.{{.FunctionName}}(ctx, req)
 	if err != nil {
 		logs.ErrorContextf(ctx, "[{{.FunctionName}}] svc{{.PackageName}}.{{.FunctionName}} failed, err: %v", err)
