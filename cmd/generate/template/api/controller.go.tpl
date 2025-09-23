@@ -17,17 +17,22 @@ import (
 // @Param request body dto{{.PackageName}}.{{.FunctionName}}Request true "request"
 // @Success 200 {object} dto{{.PackageName}}.{{.FunctionName}}Response "response"
 func {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.FunctionName}}Request, resp *dto{{.PackageName}}.{{.FunctionName}}Response) {
-	if err := validate.IsValidStruct(req, false); err != nil {
+	if err := req.Validity(req, resp); err != nil {
 		resp.Code = errcode.ErrCode_BadRequest
 		resp.Message = err.Error()
-		logs.ErrorContextf(ctx, "[{{.FunctionName}}] validate.IsValidStruct failed, err:%v, req:%s", err, logs.JSON(req))
+		logs.ErrorContextf(ctx, "[{{.FunctionName}}] request invalid, req: %s, err: %v", logs.JSON(req), err)
 		return
 	}
-	// TODO: 需要手动注册路由 and 手动定义错误码
-	if err := svc{{.PackageName}}.{{.FunctionName}}(ctx, req, resp); err != nil {
-		logs.ErrorContextf(ctx, "[{{.FunctionName}}] svc{{.PackageName}}.{{.FunctionName}} failed, err:%v, req:%s", err, logs.JSON(req))
-		resp.Code = errcode.ErrCode_{{.FunctionName}}
-		resp.Message = errcode.GetMessage(errcode.ErrCode_{{.FunctionName}})
+
+	// TODO: 需要手动注册路由
+	res, err := svc{{.PackageName}}.{{.FunctionName}}(ctx, req)
+	if err != nil {
+		logs.ErrorContextf(ctx, "[{{.FunctionName}}] svc{{.PackageName}}.{{.FunctionName}} failed, err: %v", err)
+		resp.Code = errcode.ErrCode_InternalError
+		resp.Message = errcode.GetMessage(errcode.ErrCode_InternalError)
 		return
 	}
+	resp.Code = res.Code
+	resp.Message = res.Message
+	resp.Response = res.Response
 }

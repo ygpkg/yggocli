@@ -30,7 +30,7 @@ func genApi() error {
 
 	layerParentDirMap := map[codegen.LayerName]string{
 		// codegen.LayerNameController: internalDirName,
-		// codegen.LayerNameService:    internalDirName,
+		// codegen.LayerNameService: internalDirName,
 		// codegen.LayerNameDto:        internalDirName,
 	}
 
@@ -89,8 +89,15 @@ func genApi() error {
 				Template:               v.Template,
 			},
 		}
-		if v.LayerName == controllerLayerName {
+		switch v.LayerName {
+		case controllerLayerName:
 			param.TargetDir = filepath.Dir(v.TargetDir)
+		case serviceLayerName:
+			last := filepath.Base(v.TargetDir)
+			dir := filepath.Dir(v.TargetDir)
+			secondLast := filepath.Base(dir)
+			appDir := filepath.Dir(filepath.Dir(filepath.Dir(v.TargetDir)))
+			param.TargetDir = filepath.Join(appDir, secondLast, last)
 		}
 		genParamsList = append(genParamsList, param)
 
