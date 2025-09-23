@@ -4,9 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/internal/dto/dto{{.PackageName}}"
 	"github.com/openrpacloud/{{.ProjectName}}/apps/{{.AppName}}/services/svc{{.PackageName}}"
-	"github.com/openrpacloud/{{.ProjectName}}/pkgs/apis/errcode"
+	"github.com/ygpkg/yg-go/apis/errcode"
 	"github.com/ygpkg/yg-go/logs"
-	"github.com/ygpkg/yg-go/validate"
 )
 
 // {{.FunctionName}} {{.Description}}
@@ -17,8 +16,8 @@ import (
 // @Param request body dto{{.PackageName}}.{{.FunctionName}}Request true "request"
 // @Success 200 {object} dto{{.PackageName}}.{{.FunctionName}}Response "response"
 func {{.FunctionName}}(ctx *gin.Context, req *dto{{.PackageName}}.{{.FunctionName}}Request, resp *dto{{.PackageName}}.{{.FunctionName}}Response) {
-	if req.Validity(req, resp); resp.Code != 0 {
-		logs.ErrorContextf(ctx, "[{{.FunctionName}}] request invalid, req: %s, err: %v", logs.JSON(req), err)
+	if req.Validity(resp); resp.Code != 0 {
+		logs.ErrorContextf(ctx, "[{{.FunctionName}}] request invalid, req: %s, error message: %v", logs.JSON(req), resp.Message)
 		return
 	}
 
