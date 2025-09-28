@@ -74,7 +74,7 @@ func (dao *{{.StructName}}Dao) UpdateMap(ctx context.Context, id uint, updateMap
 func (dao *{{.StructName}}Dao) Delete(ctx context.Context, id uint) error {
 	db := dao.DB(ctx).Table(dao.TableName())
 	updatedField := map[string]interface{}{
-		"deleted_time": time.Now(),
+		"deleted_at": time.Now(),
 	}
 	if err := db.Where("id = ?", id).Updates(updatedField).Error; err != nil {
 		return fmt.Errorf("[{{.StructName}}Dao] Delete fail, id:%d, err: %v", id, err)
