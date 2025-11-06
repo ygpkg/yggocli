@@ -1,0 +1,22 @@
+# -----------------------------------------------------------------
+# 资源获取 CLI (fetch) 配置文件
+# -----------------------------------------------------------------
+
+# API 服务器的根地址 (对应 --origin)
+origin: "http://127.0.0.1:8080"
+
+# 授权密钥 (对应 --auth-key)
+# 对应 FlagSet 结构体中的 mapstructure:"auth_key"
+auth_key: "wdxiRMkJoCS02Ysb"
+
+# 要获取的资源类型 (对应 --resource_type)
+resource_type: "forest"
+
+# 要获取的资源 ID 列表 (对应 --resource_ids)
+# YAML 格式的数组
+resource_ids:
+  - 930
+
+# 下载文件的目标目录 (对应 --target)
+# 建议使用绝对路径
+target: "/tmp/fetched_resources"
