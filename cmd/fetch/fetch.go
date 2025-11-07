@@ -64,11 +64,10 @@ Usage:
 	},
 }
 
-// flags 全局实例
 var flags = &FlagSet{}
 
 func init() {
-	// 关键: 添加 -f (configFile) 标志
+
 	Cmd.Flags().StringVarP(&flags.ConfigFile, "config-file", "f", "", "Configuration file path (e.g., config.yaml). If provided, all other flags are ignored.")
 
 	// 标准参数
@@ -114,7 +113,7 @@ func initConfig(configFile string) error {
 	}
 
 	fmt.Printf("Loading configuration from %s...\n", configFile)
-	viper.SetConfigFile(configFile) // 设置配置文件路径
+	viper.SetConfigFile(configFile)
 
 	if err := viper.ReadInConfig(); err != nil {
 		return fmt.Errorf("error reading config file: %w", err)
@@ -184,7 +183,6 @@ func fetchResources(processor Processor) error {
 	}
 	fmt.Printf("Response Code: %d\n", apiResponse.Code)
 
-	// 核心: 将通用数据交给处理器进行“特异性”处理
 	if err = processor.Process(apiResponse.Response.Data, flags.Target); err != nil {
 		return fmt.Errorf("error processing response: %w", err)
 	}

@@ -10,12 +10,10 @@ import (
 // ForestProcessor 实现了 Processor 接口
 type ForestProcessor struct{}
 
-// Route 实现 Processor 接口
 func (p *ForestProcessor) Route() string {
 	return "/v3/forest.GetOriginResource"
 }
 
-// PreProcessData 实现 Processor 接口
 func (p *ForestProcessor) PreProcessData(f *FlagSet) RequestBody {
 	return RequestBody{
 		Request: struct {
@@ -28,7 +26,6 @@ func (p *ForestProcessor) PreProcessData(f *FlagSet) RequestBody {
 	}
 }
 
-// Process 实现 Processor 接口 (核心：二次反序列化)
 func (p *ForestProcessor) Process(data []*GenericResource, baseDir string) error {
 	type ForestMeta struct {
 		Forest   KnownowForest `json:"forest"`

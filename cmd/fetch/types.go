@@ -26,9 +26,6 @@ type RequestBody struct {
 	Version string `json:"version"`
 }
 
-// --- 灵活的响应结构体 (使用 map[string]interface{}) ---
-
-// GenericResource 承载所有类型都共有的字段，Meta 使用 map
 type GenericResource struct {
 	ID           uint                   `json:"id"`
 	Meta         map[string]interface{} `json:"meta"` // 关键：灵活的 Meta
