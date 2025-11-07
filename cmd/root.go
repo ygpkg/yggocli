@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ygpkg/yggocli/cmd/cutter"
+	"github.com/ygpkg/yggocli/cmd/fetch"
 	"github.com/ygpkg/yggocli/cmd/generate"
 )
 
@@ -33,6 +34,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(generate.Cmd, cutter.Cmd)
+	rootCmd.AddCommand(generate.Cmd, cutter.Cmd, fetch.Cmd)
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
